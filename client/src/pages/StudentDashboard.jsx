@@ -213,294 +213,286 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-screen bg-surface">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        {/* Welcome */}
-        <div className="mb-8 animate-fade-in-up">
-          <h2 className="text-2xl font-bold text-text-main">Welcome, {user.firstName}! 👋</h2>
-          <p className="mt-1 text-text-muted">Manage your courses and track attendance.</p>
-        </div>
-
-        {/* Registration Status Banner */}
-        {statusSummary && statusSummary.status !== 'NOT_REGISTERED' && statusSummary.status !== 'NO_SEMESTER' && (
-          <div className={`mb-6 rounded-2xl border p-4 flex items-center justify-between animate-fade-in-up ${
-            statusSummary.status === 'APPROVED' ? 'border-success/30 bg-success/10' :
-            statusSummary.status === 'PENDING' ? 'border-warning/30 bg-warning/10' :
-            'border-primary/30 bg-primary/10'
-          }`}>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">
-                {statusSummary.status === 'APPROVED' ? '✅' : statusSummary.status === 'PENDING' ? '⏳' : '📋'}
-              </span>
-              <div>
-                <p className={`font-semibold ${
-                  statusSummary.status === 'APPROVED' ? 'text-success' :
-                  statusSummary.status === 'PENDING' ? 'text-warning' : 'text-primary-light'
-                }`}>
-                  Registration Status: {statusSummary.status === 'APPROVED' ? 'APPROVED' :
-                    statusSummary.status === 'PENDING' ? 'PENDING — Awaiting Batch Coordinator Approval' :
-                    'PARTIALLY APPROVED'}
-                </p>
-                <p className="text-xs text-text-muted mt-0.5">
-                  {semester} • Theory: {statusSummary.theoryCount}/6 • Practical: {statusSummary.practicalCount}/4
-                  {statusSummary.pending > 0 && ` • ${statusSummary.pending} pending`}
-                  {statusSummary.approved > 0 && ` • ${statusSummary.approved} approved`}
-                </p>
+      <main className="px-4 py-8 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          
+          {/* ── LEFT PANEL: Status & Quick Stats ────────────────── */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Welcome Card */}
+            <div className="glass-card rounded-3xl border-2">
+              <div className="text-center">
+                <div className="text-5xl mb-2">👋</div>
+                <h2 className="text-xl font-black bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">{user.firstName}!</h2>
+                <p className="text-xs text-text-muted font-semibold mt-2">Welcome back to your academic portal</p>
               </div>
             </div>
-            {statusSummary.status === 'APPROVED' && (
-              <button onClick={handlePrint} className="btn-ghost text-sm flex items-center gap-2" id="print-reg-form">
-                🖨️ Print Registration Form
+
+            {/* Status Summary */}
+            {statusSummary && statusSummary.status !== 'NOT_REGISTERED' && statusSummary.status !== 'NO_SEMESTER' && (
+              <div className={`rounded-3xl border-2 p-4 animate-fade-in-up ${
+                statusSummary.status === 'APPROVED' ? 'border-success/40 bg-gradient-to-br from-green-50 to-green-100/50' :
+                statusSummary.status === 'PENDING' ? 'border-warning/40 bg-gradient-to-br from-yellow-50 to-orange-100/50' :
+                'border-primary/40 bg-gradient-to-br from-pink-50 to-orange-50'
+              }`}>
+                <div className="text-center">
+                  <span className="text-3xl mb-2 block">
+                    {statusSummary.status === 'APPROVED' ? '✅' : statusSummary.status === 'PENDING' ? '⏳' : '📋'}
+                  </span>
+                  <p className={`font-bold text-sm mb-2 ${
+                    statusSummary.status === 'APPROVED' ? 'text-green-700' :
+                    statusSummary.status === 'PENDING' ? 'text-orange-700' : 'text-primary'
+                  }`}>
+                    {statusSummary.status === 'APPROVED' ? 'APPROVED' :
+                      statusSummary.status === 'PENDING' ? 'PENDING' :
+                      'IN PROGRESS'}
+                  </p>
+                  <p className="text-xs text-text-muted font-semibold">
+                    {statusSummary.theoryCount}T / {statusSummary.practicalCount}P
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Stats */}
+            <div className="space-y-3">
+              <div className="glass-card rounded-2xl border-2 p-4 text-center">
+                <p className="text-2xl font-black bg-gradient-to-r from-pink-400 to-pink-500 bg-clip-text text-transparent">{activeRegs.length}</p>
+                <p className="text-xs font-bold text-text-muted mt-1">Active Courses</p>
+              </div>
+              <div className="glass-card rounded-2xl border-2 p-4 text-center">
+                <p className="text-2xl font-black bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">{pendingRegs.length}</p>
+                <p className="text-xs font-bold text-text-muted mt-1">Pending Approval</p>
+              </div>
+              <div className="glass-card rounded-2xl border-2 p-4 text-center">
+                <p className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent">
+                  {activeRegs.reduce((a, r) => a + (r.CREDITS || 0), 0)}
+                </p>
+                <p className="text-xs font-bold text-text-muted mt-1">Total Credits</p>
+              </div>
+              <div className="glass-card rounded-2xl border-2 p-4 text-center">
+                <p className="text-2xl font-black bg-gradient-to-r from-purple-400 to-purple-500 bg-clip-text text-transparent">
+                  {(() => { const vals = Object.values(attendanceMap).filter(v => v !== null); return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(0) : '—'; })()}%
+                </p>
+                <p className="text-xs font-bold text-text-muted mt-1">Avg Attendance</p>
+              </div>
+            </div>
+
+            {/* Semester Info */}
+            {semester && (
+              <div className="glass-card rounded-2xl border-2 p-4 text-center bg-gradient-to-br from-accent/10 to-cyan-100/10">
+                <p className="text-lg font-black text-accent">📅</p>
+                <p className="text-sm font-bold text-text-main mt-2">{semester}</p>
+                <p className="text-xs text-text-muted font-semibold mt-1">Active Semester</p>
+              </div>
+            )}
+
+            {/* Action Button */}
+            <button 
+              onClick={() => { setShowRegForm(!showRegForm); setRegError(''); setRegSuccess(''); setCart({}); }} 
+              className={`w-full py-3 rounded-2xl font-bold text-sm transition-all border-2 ${
+                showRegForm 
+                  ? 'bg-danger/20 border-danger/40 text-danger hover:bg-danger/30' 
+                  : 'btn-primary border-primary/40 w-full'
+              }`}
+              id="register-course-btn"
+            >
+              {showRegForm ? '✕ Cancel' : '+ Register New'}
+            </button>
+
+            {statusSummary?.status === 'APPROVED' && (
+              <button onClick={handlePrint} className="w-full btn-ghost text-xs" id="print-reg-form">
+                🖨️ Print Form
               </button>
             )}
           </div>
-        )}
 
-        {/* Stats */}
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {[
-            { label: 'Active Courses', value: activeRegs.length, icon: '📚' },
-            { label: 'Pending Approval', value: pendingRegs.length, icon: '⏳' },
-            { label: 'Total Credits', value: activeRegs.reduce((a, r) => a + (r.CREDITS || 0), 0), icon: '🎓' },
-            { label: 'Avg Attendance', value: (() => { const vals = Object.values(attendanceMap).filter(v => v !== null); return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) + '%' : '—'; })(), icon: '📊' },
-          ].map((s, i) => (
-            <div key={i} className="glass-card flex items-center gap-4" style={{ animationDelay: `${i * 100}ms` }}>
-              <span className="text-3xl">{s.icon}</span>
-              <div>
-                <p className="text-2xl font-bold text-text-main">{s.value}</p>
-                <p className="text-sm text-text-muted">{s.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Success / Error Messages */}
-        {regSuccess && (
-          <div className="mb-4 rounded-lg bg-success/10 px-4 py-3 text-sm text-success animate-fade-in-up">
-            {regSuccess}
-          </div>
-        )}
-
-        {/* Action Bar */}
-        <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-text-main">My Courses</h3>
-          <button onClick={() => { setShowRegForm(!showRegForm); setRegError(''); setRegSuccess(''); setCart({}); }} className="btn-primary text-sm" id="register-course-btn">
-            {showRegForm ? 'Cancel' : '+ Register Courses'}
-          </button>
-        </div>
-
-        {/* ── Registration Form — Multi-Course Selection ────────── */}
-        {showRegForm && (
-          <div className="glass-card mb-6 animate-fade-in-up">
-            <div className="mb-4 flex items-center justify-between">
-              <h4 className="font-semibold text-text-main">Sem. Course Registration</h4>
-              <span className="rounded-lg bg-primary/20 px-3 py-1 text-sm font-semibold text-primary-light">{semester}</span>
-            </div>
-
-            {/* Instructions Banner */}
-            <div className="mb-4 rounded-xl bg-white/5 border border-white/10 p-4 text-xs text-text-muted space-y-1">
-              <p className="font-semibold text-text-main text-sm mb-2">📋 Registration Instructions</p>
-              <p>• Select your courses (max <strong className="text-primary-light">6 Theory</strong> + <strong className="text-accent">4 Practical</strong>)</p>
-              <p>• Consult your Batch Coordinator before finalizing.</p>
-              <p>• Click <strong className="text-text-main">"APPLY FOR REGISTRATION"</strong> to submit all selected courses.</p>
-              <p>• Your Batch Coordinator will review and approve your registration online.</p>
-              <p>• Status will change to <strong className="text-warning">PENDING</strong> → <strong className="text-success">APPROVED</strong>.</p>
-            </div>
-
-            {/* Selection Counters */}
-            <div className="mb-4 flex gap-4 items-center">
-              <div className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold border ${
-                (existingTheory + cartTheory) > 6 ? 'border-danger/50 bg-danger/10 text-danger' : 'border-primary/30 bg-primary/10 text-primary-light'
-              }`}>
-                📖 Theory: <strong>{existingTheory + cartTheory}</strong>/6
-              </div>
-              <div className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold border ${
-                (existingPractical + cartPractical) > 4 ? 'border-danger/50 bg-danger/10 text-danger' : 'border-accent/30 bg-accent/10 text-accent'
-              }`}>
-                🔬 Practical: <strong>{existingPractical + cartPractical}</strong>/4
-              </div>
-              <span className="text-xs text-text-muted ml-auto">
-                {Object.keys(cart).length} course(s) in cart
-              </span>
-            </div>
-
-            {/* Course List — Theory */}
-            {theoryCourses.length > 0 && (
-              <div className="mb-4">
-                <h5 className="text-sm font-semibold text-primary-light mb-2 flex items-center gap-2">
-                  📖 Theory Courses ({theoryCourses.length})
-                </h5>
-                <div className="space-y-2">
-                  {theoryCourses.map(course => {
-                    const alreadyRegistered = currentSemRegs.some(r => r.COURSE_CODE === course.COURSE_CODE);
-                    const inCart = isCourseInCart(course.COURSE_ID);
-                    const disabled = alreadyRegistered || ((existingTheory + cartTheory) >= 6 && !inCart);
-                    return (
-                      <CourseSelectRow
-                        key={course.COURSE_ID}
-                        course={course}
-                        inCart={inCart}
-                        disabled={disabled}
-                        alreadyRegistered={alreadyRegistered}
-                        onAdd={() => addToCart(course)}
-                        onRemove={() => removeFromCart(course.COURSE_ID)}
-                      />
-                    );
-                  })}
+          {/* ── CENTER/RIGHT PANEL: Registration Form & Courses ─── */}
+          <div className="lg:col-span-3 space-y-6">
+            
+            {/* Registration Form */}
+            {showRegForm && (
+              <div className="glass-card rounded-3xl border-2 animate-fade-in-up">
+                <div className="mb-4">
+                  <h4 className="font-bold text-lg text-text-main mb-2">📝 Course Registration</h4>
+                  <p className="text-xs text-text-muted">Select theory and practical courses for {semester}</p>
                 </div>
-              </div>
-            )}
 
-            {/* Course List — Practical */}
-            {practicalCourses.length > 0 && (
-              <div className="mb-4">
-                <h5 className="text-sm font-semibold text-accent mb-2 flex items-center gap-2">
-                  🔬 Practical Courses ({practicalCourses.length})
-                </h5>
-                <div className="space-y-2">
-                  {practicalCourses.map(course => {
-                    const alreadyRegistered = currentSemRegs.some(r => r.COURSE_CODE === course.COURSE_CODE);
-                    const inCart = isCourseInCart(course.COURSE_ID);
-                    const disabled = alreadyRegistered || ((existingPractical + cartPractical) >= 4 && !inCart);
-                    return (
-                      <CourseSelectRow
-                        key={course.COURSE_ID}
-                        course={course}
-                        inCart={inCart}
-                        disabled={disabled}
-                        alreadyRegistered={alreadyRegistered}
-                        onAdd={() => addToCart(course)}
-                        onRemove={() => removeFromCart(course.COURSE_ID)}
-                      />
-                    );
-                  })}
+                {/* Instructions */}
+                <div className="mb-4 rounded-2xl bg-yellow-100/50 border-2 border-warning/40 p-3 text-xs text-text-main space-y-1">
+                  <p>✓ Select up to <strong>6 Theory</strong> + <strong>4 Practical</strong> courses</p>
+                  <p>✓ Submit for Batch Coordinator approval</p>
                 </div>
-              </div>
-            )}
 
-            {courses.length === 0 && (
-              <p className="text-sm text-text-muted text-center py-4">No courses available for this semester.</p>
-            )}
-
-            {/* Cart Summary & Submit */}
-            {Object.keys(cart).length > 0 && (
-              <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                <h5 className="text-sm font-semibold text-text-main mb-2">Selected Courses ({Object.keys(cart).length})</h5>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {Object.values(cart).map(item => (
-                    <span key={item.courseId} className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs">
-                      <span className={`inline-block w-2 h-2 rounded-full ${item.courseType === 'THEORY' ? 'bg-primary' : 'bg-accent'}`}></span>
-                      <strong className="text-text-main">{item.courseCode}</strong>
-                      <button onClick={() => removeFromCart(item.courseId)} className="ml-1 text-danger hover:text-danger/80">✕</button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-3">
-                  <button onClick={handleBulkRegister} className="btn-primary text-sm" disabled={regLoading} id="apply-for-registration">
-                    {regLoading ? 'Submitting…' : '📝 APPLY FOR REGISTRATION'}
-                  </button>
-                  <span className="text-xs text-text-muted">
-                    Total Credits: {Object.values(cart).reduce((a, c) => a + (c.credits || 0), 0)}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {regError && <p className="mt-3 text-sm text-danger">{regError}</p>}
-          </div>
-        )}
-
-        {/* ── Course Cards ──────────────────────────────── */}
-        {loadingReg ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {[1, 2, 3].map((i) => <div key={i} className="skeleton h-48 rounded-2xl" />)}
-          </div>
-        ) : registrations.length === 0 ? (
-          <div className="glass-card text-center">
-            <p className="text-text-muted">No courses registered yet. Click "Register Courses" to get started.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {registrations.map((reg, i) => (
-              <div key={reg.REGISTRATION_ID} className="glass-card animate-fade-in-up" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="mb-3 flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-text-main">{reg.COURSE_CODE}</h4>
-                      <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold ${
-                        reg.COURSE_TYPE === 'PRACTICAL' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary-light'
-                      }`}>
-                        {reg.COURSE_TYPE === 'PRACTICAL' ? '🔬 PRAC' : '📖 THY'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-text-muted">{reg.COURSE_NAME}</p>
+                {/* Counters */}
+                <div className="mb-4 grid grid-cols-2 gap-3">
+                  <div className={`rounded-2xl px-3 py-2 text-center border-2 text-xs font-bold ${
+                    (existingTheory + cartTheory) > 6 ? 'border-danger/60 bg-red-100 text-red-700' : 'border-primary/40 bg-pink-50 text-primary'
+                  }`}>
+                    <p className="text-lg">📖</p>
+                    <p className="mt-1">{existingTheory + cartTheory}/6 Theory</p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`badge ${
-                      reg.STATUS === 'ACTIVE' ? 'badge-present' : 
-                      reg.STATUS === 'PENDING' ? 'badge-pending' : 
-                      reg.STATUS === 'DROP_PENDING' ? 'badge-absent' :
-                      reg.STATUS === 'DROPPED' ? 'badge-absent' : 
-                      reg.STATUS === 'CANCELLED' ? 'badge-absent' : 'badge-absent'
-                    }`}>{reg.STATUS}</span>
-                    
-                    {reg.STATUS === 'ACTIVE' && (
-                      <button onClick={() => setDropTarget(reg.REGISTRATION_ID)} className="btn-danger p-2 px-3 text-xs ml-2">Request Drop</button>
-                    )}
-                    {reg.STATUS === 'DROP_PENDING' && (
-                      <button disabled className="btn-danger p-2 px-3 text-xs opacity-50 cursor-not-allowed ml-2">Drop Pending</button>
-                    )}
+                  <div className={`rounded-2xl px-3 py-2 text-center border-2 text-xs font-bold ${
+                    (existingPractical + cartPractical) > 4 ? 'border-danger/60 bg-red-100 text-red-700' : 'border-cyan-400/40 bg-cyan-50 text-cyan-700'
+                  }`}>
+                    <p className="text-lg">🔬</p>
+                    <p className="mt-1">{existingPractical + cartPractical}/4 Practical</p>
                   </div>
                 </div>
 
-                <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-text-muted">
-                  <span>Section: <strong className="text-text-main">{reg.SECTION_NAME || 'Pending Assignment'}</strong></span>
-                  <span>Credits: <strong className="text-text-main">{reg.CREDITS}</strong></span>
-                  <span>Semester: <strong className="text-text-main">{reg.SEMESTER}</strong></span>
-                  <span>Room: <strong className="text-text-main">{reg.ROOM || 'TBA'}</strong></span>
-                  {reg.SCHEDULE && <span className="col-span-2">Schedule: <strong className="text-text-main">{reg.SCHEDULE}</strong></span>}
-                </div>
-
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {reg.SECTION_COORDINATOR && (
-                    <span className="rounded-full bg-primary/15 px-3 py-1 text-xs text-primary-light">👨‍🏫 {reg.SECTION_COORDINATOR}</span>
-                  )}
-                  {reg.BATCH_NAME && (
-                    <span className="rounded-full bg-accent/15 px-3 py-1 text-xs text-accent">
-                      🔬 {reg.BATCH_NAME}{reg.BATCH_COORDINATOR ? `: ${reg.BATCH_COORDINATOR}` : ''}
-                    </span>
-                  )}
-                </div>
-
-                {/* Attendance Bar (only for ACTIVE with section assigned) */}
-                {reg.STATUS === 'ACTIVE' && reg.SECTION_ID && (
-                  <div>
-                    <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="text-text-muted">Attendance</span>
-                      <span className={`font-bold ${getPctColor(attendanceMap[reg.SECTION_ID])}`}>
-                        {attendanceMap[reg.SECTION_ID] != null ? `${attendanceMap[reg.SECTION_ID]}%` : '—'}
-                      </span>
+                {/* Theory Courses */}
+                {theoryCourses.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs font-bold text-primary mb-2 bg-pink-50 rounded-lg p-2">📖 THEORY COURSES</p>
+                    <div className="space-y-2">
+                      {theoryCourses.map(course => {
+                        const alreadyRegistered = currentSemRegs.some(r => r.COURSE_CODE === course.COURSE_CODE);
+                        const inCart = isCourseInCart(course.COURSE_ID);
+                        const disabled = alreadyRegistered || ((existingTheory + cartTheory) >= 6 && !inCart);
+                        return (
+                          <CourseSelectRow key={course.COURSE_ID} course={course} inCart={inCart} disabled={disabled} alreadyRegistered={alreadyRegistered} onAdd={() => addToCart(course)} onRemove={() => removeFromCart(course.COURSE_ID)} />
+                        );
+                      })}
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-700" style={{ width: `${attendanceMap[reg.SECTION_ID] || 0}%` }} />
-                    </div>
-                    {attendanceMap[reg.SECTION_ID] != null && attendanceMap[reg.SECTION_ID] < 75 && (
-                      <p className="mt-1 text-xs text-danger">⚠ Below 75% minimum attendance requirement</p>
-                    )}
                   </div>
                 )}
 
-                {/* Actions */}
-                <div className="mt-4 flex items-center gap-4">
-                  {reg.STATUS === 'ACTIVE' && reg.SECTION_ID && (
-                    <button onClick={() => openAttendanceDetail(reg.SECTION_ID)} className="text-xs text-primary-light hover:underline">
-                      📋 View Attendance
+                {/* Practical Courses */}
+                {practicalCourses.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs font-bold text-cyan-700 mb-2 bg-cyan-50 rounded-lg p-2">🔬 PRACTICAL COURSES</p>
+                    <div className="space-y-2">
+                      {practicalCourses.map(course => {
+                        const alreadyRegistered = currentSemRegs.some(r => r.COURSE_CODE === course.COURSE_CODE);
+                        const inCart = isCourseInCart(course.COURSE_ID);
+                        const disabled = alreadyRegistered || ((existingPractical + cartPractical) >= 4 && !inCart);
+                        return (
+                          <CourseSelectRow key={course.COURSE_ID} course={course} inCart={inCart} disabled={disabled} alreadyRegistered={alreadyRegistered} onAdd={() => addToCart(course)} onRemove={() => removeFromCart(course.COURSE_ID)} />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected Courses & Submit */}
+                {Object.keys(cart).length > 0 && (
+                  <div className="mt-4 rounded-2xl bg-pink-50 border-2 border-primary/40 p-3">
+                    <p className="text-xs font-bold text-text-main mb-2">✓ SELECTED ({Object.keys(cart).length})</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {Object.values(cart).map(item => (
+                        <span key={item.courseId} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-pink-100 to-orange-100 border border-primary/30 px-2.5 py-1 text-xs font-semibold">
+                          <strong>{item.courseCode}</strong>
+                          <button onClick={() => removeFromCart(item.courseId)} className="text-danger hover:text-danger/80 font-bold">✕</button>
+                        </span>
+                      ))}
+                    </div>
+                    <button onClick={handleBulkRegister} className="w-full btn-primary text-xs font-bold" disabled={regLoading} id="apply-for-registration">
+                      {regLoading ? '⏳ Submitting…' : '📝 APPLY FOR REGISTRATION'}
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {regError && <p className="mt-2 text-xs font-bold text-red-700 bg-red-100 rounded-lg p-2">{regError}</p>}
+                {regSuccess && <p className="mt-2 text-xs font-bold text-green-700 bg-green-100 rounded-lg p-2">✅ {regSuccess}</p>}
               </div>
-            ))}
+            )}
+
+            {/* Courses Grid */}
+            {loadingReg ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2, 3, 4].map((i) => <div key={i} className="skeleton h-48 rounded-3xl" />)}
+              </div>
+            ) : registrations.length === 0 ? (
+              <div className="glass-card text-center py-12 rounded-3xl border-2">
+                <p className="text-lg text-text-muted font-bold">📚 No courses yet. Register to get started!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {registrations.map((reg, i) => (
+                  <div 
+                    key={reg.REGISTRATION_ID} 
+                    className="glass-card rounded-2xl border-2 overflow-hidden animate-fade-in-up"
+                    style={{ animationDelay: `${i * 60}ms` }}
+                  >
+                    {/* Top Bar */}
+                    <div className={`h-1 w-full ${reg.COURSE_TYPE === 'PRACTICAL' ? 'bg-cyan-400' : 'bg-primary'}`}></div>
+                    
+                    <div className="p-4">
+                      {/* Header */}
+                      <div className="mb-3 flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-sm bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">{reg.COURSE_CODE}</h4>
+                            <span className={`text-[10px] font-bold rounded px-1.5 py-0.5 ${
+                              reg.COURSE_TYPE === 'PRACTICAL' ? 'bg-cyan-100 text-cyan-700' : 'bg-pink-100 text-primary'
+                            }`}>
+                              {reg.COURSE_TYPE === 'PRACTICAL' ? 'PRAC' : 'THY'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-text-muted font-semibold mt-1">{reg.COURSE_NAME}</p>
+                        </div>
+                        {reg.SEMESTER === semester && (
+                          <span className={`badge text-[10px] font-bold ${
+                            reg.STATUS === 'ACTIVE' ? 'badge-present' : 
+                            reg.STATUS === 'PENDING' ? 'badge-pending' : 
+                            'badge-absent'
+                          }`}>{reg.STATUS}</span>
+                        )}
+                      </div>
+
+                      {/* Info Grid */}
+                      <div className="mb-3 grid grid-cols-3 gap-2 text-[10px]">
+                        <div className="rounded-lg bg-pink-50 border border-primary/20 p-1.5 text-center">
+                          <p className="font-bold text-text-main">{reg.SECTION_NAME || 'TBA'}</p>
+                          <p className="text-text-muted">Sec</p>
+                        </div>
+                        <div className="rounded-lg bg-cyan-50 border border-cyan-300/20 p-1.5 text-center">
+                          <p className="font-bold text-cyan-700">{reg.CREDITS}</p>
+                          <p className="text-text-muted">Cred</p>
+                        </div>
+                        <div className="rounded-lg bg-orange-50 border border-orange-300/20 p-1.5 text-center">
+                          <p className="font-bold text-orange-700">{reg.SEMESTER}</p>
+                          <p className="text-text-muted">Sem</p>
+                        </div>
+                      </div>
+
+                      {/* Attendance */}
+                      {reg.STATUS === 'ACTIVE' && reg.SECTION_ID && (
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-bold text-text-main">Attendance</span>
+                            <span className={`font-bold text-xs ${getPctColor(attendanceMap[reg.SECTION_ID])}`}>
+                              {attendanceMap[reg.SECTION_ID] != null ? `${attendanceMap[reg.SECTION_ID]}%` : '—'}
+                            </span>
+                          </div>
+                          <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-primary to-pink-500" 
+                              style={{ width: `${attendanceMap[reg.SECTION_ID] || 0}%` }} 
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-2">
+                        {reg.STATUS === 'ACTIVE' && reg.SECTION_ID && (
+                          <button onClick={() => openAttendanceDetail(reg.SECTION_ID)} className="flex-1 text-[10px] text-primary font-bold hover:bg-primary/10 rounded py-1.5 transition-all">
+                            📋 Att
+                          </button>
+                        )}
+                        {reg.STATUS === 'ACTIVE' && reg.SEMESTER === semester && (
+                          <button onClick={() => setDropTarget(reg.REGISTRATION_ID)} className="flex-1 text-[10px] font-bold text-red-700 bg-red-100 rounded py-1.5 hover:bg-red-200 transition-all">
+                            🗑️ Drop
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
 
       {/* ── Printable Registration Form (hidden) ────────── */}

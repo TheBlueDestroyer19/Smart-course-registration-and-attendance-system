@@ -31,7 +31,8 @@ export default function AdminDashboard() {
     deptId: '',
     credits: 3,
     description: '',
-    courseType: 'THEORY'
+    courseType: 'THEORY',
+    targetSemester: 1
   });
 
   // Section Modal State
@@ -113,6 +114,12 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (activeSemester) {
+      setNewSection(prev => ({ ...prev, semester: activeSemester }));
+    }
+  }, [activeSemester]);
+
   const handleSetSemester = async (sem) => {
     try {
       await api.put('/admin/semester', { semester: sem });
@@ -142,10 +149,15 @@ export default function AdminDashboard() {
   const handleAddCourse = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/admin/courses', newCourse);
+      const courseData = {
+        ...newCourse,
+        credits: Number(newCourse.credits),
+        targetSemester: Number(newCourse.targetSemester)
+      };
+      await api.post('/admin/courses', courseData);
       setMessage(`Course ${newCourse.courseCode.toUpperCase()} added.`);
       setShowCourseModal(false);
-      setNewCourse({ courseCode: '', courseName: '', deptId: '', credits: 3, description: '', courseType: 'THEORY' });
+      setNewCourse({ courseCode: '', courseName: '', deptId: '', credits: 3, description: '', courseType: 'THEORY', targetSemester: 1 });
       fetchData(); // refresh courses
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
@@ -329,486 +341,356 @@ export default function AdminDashboard() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-surface relative pb-10">
+    <div className="min-h-screen bg-surface">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-8 animate-fade-in-up">
-          <h2 className="text-2xl font-bold text-text-main">Admin Dashboard ⚙️</h2>
-          <p className="mt-1 text-text-muted">Manage semesters, courses, FA assignments, and registrations.</p>
-        </div>
+      <main className="px-4 py-8 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          
+          {/* ── LEFT PANEL: Nav & Quick Stats ──────────────────── */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Header */}
+            <div className="glass-card rounded-3xl border-2 text-center">
+              <div className="text-4xl mb-2">⚙️</div>
+              <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Admin Control</h2>
+              <p className="text-xs text-text-muted mt-2 font-semibold">System Management</p>
+            </div>
 
-        {/* Tabs */}
-        <div className="mb-6 flex gap-2">
-          {[
-            { key: 'overview', label: '📊 Overview' },
-            { key: 'people', label: '🧑‍🎓 People' },
-            { key: 'fa-assignment', label: '👨‍🏫 Batch Coordinator Assignment' },
-            { key: 'section-assignment', label: '📋 Section Assignment' },
-          ].map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
-                tab === t.key
-                  ? 'bg-gradient-to-r from-primary to-accent text-white shadow-lg'
-                  : 'border border-white/15 text-text-muted hover:text-text-main'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── Overview Tab ──────────────────────────────── */}
-        {tab === 'overview' && (
-          <>
-            {/* Semester Management */}
-            <div className="glass-card mb-6 animate-fade-in-up">
-              <h3 className="mb-4 font-semibold text-text-main flex items-center gap-2">
-                Active Semester List
-                <button onClick={() => setShowAddSemester(!showAddSemester)} className="btn-ghost !py-1 !px-2 text-xs">
-                  + New
+            {/* Tab Navigation - Vertical */}
+            <div className="glass-card rounded-3xl border-2 p-0 overflow-hidden space-y-0">
+              {[
+                { key: 'overview', label: '📊 Overview' },
+                { key: 'people', label: '👥 People' },
+                { key: 'fa-assignment', label: '🎯 Coordinators' },
+                { key: 'section-assignment', label: '📋 Sections' },
+              ].map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`w-full text-left px-4 py-3 text-sm font-bold border-b transition-all last:border-b-0 ${
+                    tab === t.key
+                      ? 'bg-gradient-to-r from-primary via-pink-500 to-orange-400 text-white'
+                      : 'text-text-main hover:bg-primary/5'
+                  }`}
+                >
+                  {t.label}
                 </button>
-              </h3>
-              
-              {showAddSemester && (
-                <form onSubmit={handleAddSemester} className="mb-4 flex items-center gap-2 p-3 bg-white/5 rounded-xl border border-white/10">
+              ))}
+            </div>
+
+            {/* Semester Control */}
+            <div className="glass-card rounded-2xl border-2 p-4">
+              <p className="text-xs font-bold text-text-muted mb-2 uppercase">Active Semester</p>
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-lg font-black text-primary">{activeSemester || '—'}</span>
+                {showAddSemester && (
+                  <button onClick={() => setShowAddSemester(false)} className="text-xs text-text-muted hover:text-text-main">✕</button>
+                )}
+              </div>
+              {showAddSemester ? (
+                <form onSubmit={handleAddSemester} className="space-y-2">
                   <input 
                     type="text" 
                     placeholder="e.g. SUMMER-2026" 
                     value={newSemesterStr} 
                     onChange={(e) => setNewSemesterStr(e.target.value)}
-                    className="input-field !mb-0 flex-1"
+                    className="input-field !text-xs !py-2 !mb-0"
                     required
                   />
-                  <button type="submit" className="btn-primary !px-4 !py-1.5 whitespace-nowrap">Add Semester</button>
+                  <button type="submit" className="w-full btn-primary text-xs !py-2">Add</button>
                 </form>
+              ) : (
+                <button onClick={() => setShowAddSemester(true)} className="w-full btn-ghost text-xs !py-2">+ New Semester</button>
               )}
+            </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                {semesters.length === 0 && <span className="text-sm text-text-muted">No semesters configured.</span>}
-                {semesters.map((s) => (
-                  <button
-                    key={s.value}
-                    onClick={() => handleSetSemester(s.value)}
-                    className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-all ${
-                      activeSemester === s.value
-                        ? 'border-primary bg-primary/20 text-primary-light'
-                        : 'border-white/15 text-text-muted hover:border-primary-light hover:text-text-main'
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+            {/* Quick Stats */}
+            <div className="space-y-2">
+              <div className="glass-card rounded-2xl border-2 p-3">
+                <p className="text-2xl font-black text-primary">{Object.keys(courseGroups).length}</p>
+                <p className="text-xs font-bold text-text-muted mt-1">Courses</p>
               </div>
-              {message && <p className="mt-3 text-sm text-success">{message}</p>}
+              <div className="glass-card rounded-2xl border-2 p-3">
+                <p className="text-2xl font-black text-cyan-700">{adminInstructors.length}</p>
+                <p className="text-xs font-bold text-text-muted mt-1">Faculty</p>
+              </div>
+              <div className="glass-card rounded-2xl border-2 p-3">
+                <p className="text-2xl font-black text-orange-600">{students.length}</p>
+                <p className="text-xs font-bold text-text-muted mt-1">Students</p>
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
-              {[
-                { label: 'Courses', value: Object.keys(courseGroups).length, icon: '📚' },
-                { label: 'Sections', value: courses.filter(c => c.SECTION_ID).length, icon: '📋' },
-                { label: 'Registrations', value: registrations.length, icon: '👥' },
-                { label: 'Students w/ Coordinator', value: students.filter(s => s.FA_ID).length + '/' + students.length, icon: '👨‍🏫' },
-              ].map((s, i) => (
-                <div key={i} className="glass-card flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
-                  <span className="text-3xl">{s.icon}</span>
-                  <div>
-                    <p className="text-2xl font-bold text-text-main">{s.value}</p>
-                    <p className="text-sm text-text-muted">{s.label}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Course–Semester Grid */}
-            <div className="flex items-center justify-between mb-4 animate-fade-in-up">
-              <h3 className="text-lg font-semibold text-text-main">Courses & Sections</h3>
-              <button onClick={() => setShowCourseModal(true)} className="btn-primary !py-1.5 !px-4 text-sm flex items-center gap-2">
+            {/* Action Buttons */}
+            <div className="space-y-2">
+              <button onClick={() => setShowCourseModal(true)} className="w-full btn-primary text-xs !py-2 flex justify-center items-center gap-1">
                 <span>+</span> Add Course
               </button>
+              <button onClick={() => setShowInstructorModal(true)} className="w-full bg-cyan-500/20 border-2 border-cyan-500/40 text-cyan-700 font-bold text-xs rounded-2xl py-2 hover:bg-cyan-500/30 transition-all">
+                + Add Faculty
+              </button>
+              <button onClick={() => setShowStudentModal(true)} className="w-full bg-orange-500/20 border-2 border-orange-500/40 text-orange-700 font-bold text-xs rounded-2xl py-2 hover:bg-orange-500/30 transition-all">
+                + Add Student
+              </button>
             </div>
-            <div className="space-y-3 mb-8 animate-fade-in-up">
-              {Object.keys(courseGroups).length === 0 && <div className="glass-card text-center text-text-muted p-6">No courses established.</div>}
-              {Object.values(courseGroups).map((cg) => (
-                <div key={cg.code} className="glass-card !p-4">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-text-main">{cg.code}</span>
-                      <span className="text-sm font-medium text-text-muted">{cg.name}</span>
-                      <span className={`rounded-md px-2 py-0.5 text-xs font-bold ${
-                        cg.courseType === 'PRACTICAL' ? 'bg-accent/15 text-accent' : 'bg-primary/15 text-primary-light'
-                      }`}>
-                        {cg.courseType === 'PRACTICAL' ? '🔬 PRACTICAL' : '📖 THEORY'}
-                      </span>
-                      <span className="rounded-md bg-white/10 px-2 py-0.5 text-xs text-text-muted">
-                        {cg.credits} credits
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-text-muted bg-white/5 px-2 py-1 rounded-md">{cg.dept}</span>
-                      <button
-                        onClick={() => {
-                          const anyRow = cg.sections[0] || courses.find(c => c.COURSE_CODE === cg.code);
-                          handleDeleteCourse(anyRow?.COURSE_ID, cg.code);
-                        }}
-                        className="btn-ghost !px-2 !py-1 text-xs text-warning"
-                        title="Delete course"
-                      >
-                        🗑 Delete
-                      </button>
-                      <button 
-                        onClick={() => {
-                          setNewSection({...newSection, courseId: cg.sections[0]?.COURSE_ID || courses.find(c => c.COURSE_CODE === cg.code).COURSE_ID, semester: activeSemester});
-                          setShowSectionModal(true);
-                        }}
-                        className="btn-ghost !px-2 !py-1 text-xs"
-                      >
-                        + Add Section
-                      </button>
+          </div>
+
+          {/* ── RIGHT PANEL: Content ───────────────────────────── */}
+          <div className="lg:col-span-3">
+            
+            {loading ? (
+              <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="skeleton h-20 rounded-2xl" />)}</div>
+            ) : tab === 'overview' ? (
+              <div className="space-y-6 animate-fade-in-up">
+                {/* Semesters */}
+                <div className="glass-card rounded-2xl border-2 p-4">
+                  <p className="text-sm font-bold text-text-main mb-3">Available Semesters</p>
+                  <div className="flex flex-wrap gap-2">
+                    {semesters.length === 0 ? (
+                      <span className="text-xs text-text-muted">No semesters configured</span>
+                    ) : (
+                      semesters.map((s) => (
+                        <button
+                          key={s.value}
+                          onClick={() => handleSetSemester(s.value)}
+                          className={`rounded-lg text-xs font-bold px-3 py-1.5 border-2 transition-all ${
+                            activeSemester === s.value
+                              ? 'border-primary bg-primary/20 text-primary-light'
+                              : 'border-white/20 text-text-muted hover:border-primary/40'
+                          }`}
+                        >
+                          {s.label}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Courses Grid */}
+                <div>
+                  <h3 className="text-lg font-bold text-text-main mb-3">Courses & Sections ({Object.keys(courseGroups).length})</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {Object.values(courseGroups).length === 0 ? (
+                      <div className="col-span-full text-center text-text-muted py-8">No courses</div>
+                    ) : (
+                      Object.values(courseGroups).map((cg) => (
+                        <div key={cg.code} className="glass-card rounded-2xl border-2 p-3 animate-fade-in-up">
+                          <div className="mb-2">
+                            <p className="font-bold text-text-main text-sm">{cg.code}</p>
+                            <p className="text-xs text-text-muted">{cg.name}</p>
+                          </div>
+                          <div className="flex gap-2 mb-2 flex-wrap">
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                              cg.courseType === 'PRACTICAL' ? 'bg-cyan-200/30 text-cyan-700' : 'bg-pink-200/30 text-primary'
+                            }`}>
+                              {cg.courseType === 'PRACTICAL' ? '🔬 PRAC' : '📖 THY'}
+                            </span>
+                            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-bold">{cg.credits}cr</span>
+                          </div>
+                          <p className="text-[10px] text-text-muted mb-2">{cg.sections.length} section(s)</p>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => {
+                                const anyRow = cg.sections[0] || courses.find(c => c.COURSE_CODE === cg.code);
+                                handleDeleteCourse(anyRow?.COURSE_ID, cg.code);
+                              }}
+                              className="flex-1 bg-danger/20 text-danger text-[10px] font-bold py-1 rounded hover:bg-danger/30"
+                            >
+                              🗑 Delete
+                            </button>
+                            <button 
+                              onClick={() => {
+                                setNewSection({...newSection, courseId: cg.sections[0]?.COURSE_ID || courses.find(c => c.COURSE_CODE === cg.code).COURSE_ID, semester: activeSemester});
+                                setShowSectionModal(true);
+                              }}
+                              className="flex-1 bg-primary/20 text-primary text-[10px] font-bold py-1 rounded hover:bg-primary/30"
+                            >
+                              + Sec
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Recent Registrations */}
+                <div>
+                  <h3 className="text-lg font-bold text-text-main mb-3">Latest Registrations</h3>
+                  <div className="glass-card rounded-2xl border-2 p-3 max-h-96 overflow-y-auto">
+                    <div className="space-y-2">
+                      {registrations.slice(0, 15).map((r, i) => (
+                        <div key={i} className="bg-white/5 rounded-lg p-2 border border-white/10 text-xs">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="font-bold text-text-main">{r.STUDENT_NAME}</p>
+                              <p className="text-text-muted">{r.COURSE_CODE}</p>
+                            </div>
+                            <span className={`badge text-[10px] ${r.STATUS === 'ACTIVE' ? 'badge-present' : 'badge-pending'}`}>
+                              {r.STATUS}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  
-                  <div className="mt-3">
-                    {cg.sections.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {cg.sections.map((sec) => (
-                          <span key={sec.SECTION_ID} className="rounded-lg bg-surface px-3 py-1.5 text-xs text-text-muted border border-white/10 flex items-center gap-2">
-                            <span className="font-bold text-primary-light">Sec {sec.SECTION_NAME}</span> 
-                            <span>•</span> 
-                            <span className="text-text-main">{sec.SEMESTER}</span>
-                            <span>•</span>
-                            <span>{sec.COORDINATOR || 'No coordinator'}</span>
+                </div>
+              </div>
+            ) : tab === 'people' ? (
+              <div className="space-y-6 animate-fade-in-up">
+                {/* Faculty Table */}
+                <div>
+                  <h3 className="text-lg font-bold text-text-main mb-3">Faculty ({adminInstructors.length})</h3>
+                  <div className="glass-card rounded-2xl border-2 overflow-hidden">
+                    <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
+                      {adminInstructors.length === 0 ? (
+                        <div className="p-4 text-center text-text-muted text-sm">No faculty</div>
+                      ) : (
+                        adminInstructors.map((i) => (
+                          <div key={i.INSTRUCTOR_ID} className="p-3 hover:bg-white/5 flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="text-sm font-bold text-text-main">{i.FIRST_NAME} {i.LAST_NAME}</p>
+                              <p className="text-xs text-text-muted">{i.EMAIL}</p>
+                              <p className="text-[10px] text-text-muted">{i.DESIGNATION}</p>
+                            </div>
                             <button
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteSection(sec.SECTION_ID, cg.code, sec.SECTION_NAME); }}
-                              className="ml-2 rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-warning border border-white/10 hover:bg-white/10"
-                              title="Delete section"
+                              onClick={() => handleDeleteInstructor(i.INSTRUCTOR_ID, `${i.FIRST_NAME} ${i.LAST_NAME}`)}
+                              className="text-danger hover:bg-danger/20 px-2 py-1 rounded text-xs font-bold"
                             >
                               🗑
                             </button>
-                          </span>
-                        ))}
-                      </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Students Table */}
+                <div>
+                  <h3 className="text-lg font-bold text-text-main mb-3">Students ({students.length})</h3>
+                  <div className="glass-card rounded-2xl border-2 overflow-hidden">
+                    <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
+                      {students.length === 0 ? (
+                        <div className="p-4 text-center text-text-muted text-sm">No students</div>
+                      ) : (
+                        students.map((s) => (
+                          <div key={s.STUDENT_ID} className="p-3 hover:bg-white/5 text-xs">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="font-bold text-text-main">{s.FIRST_NAME} {s.LAST_NAME}</p>
+                              <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono">{s.ENROLLMENT_NUMBER || '-'}</span>
+                            </div>
+                            <p className="text-text-muted">{s.EMAIL}</p>
+                            <button
+                              onClick={() => handleDeleteStudent(s.STUDENT_ID, `${s.FIRST_NAME} ${s.LAST_NAME}`)}
+                              className="mt-1 text-danger hover:bg-danger/20 px-2 py-0.5 rounded text-[10px] font-bold"
+                            >
+                              🗑 Delete
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : tab === 'fa-assignment' ? (
+              <div className="animate-fade-in-up">
+                <h3 className="text-lg font-bold text-text-main mb-4">Batch Coordinator Assignment</h3>
+                
+                {/* Filters */}
+                <div className="glass-card rounded-2xl border-2 p-3 mb-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <select className="input-field !text-sm" value={faFilter.dept} onChange={(e) => setFaFilter(prev => ({ ...prev, dept: e.target.value }))}>
+                      <option value="">All Departments</option>
+                      {[...new Set(students.map(s => s.DEPT_NAME))].sort().map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                    <select className="input-field !text-sm" value={selectedFA} onChange={(e) => setSelectedFA(e.target.value)}>
+                      <option value="">Select Coordinator</option>
+                      {instructors.map(inst => (
+                        <option key={inst.INSTRUCTOR_ID} value={inst.INSTRUCTOR_ID}>
+                          {inst.INSTRUCTOR_NAME}
+                        </option>
+                      ))}
+                    </select>
+                    <button onClick={handleAssignFA} disabled={faActionLoading || selectedStudents.length === 0} className="btn-primary !text-xs !py-2">
+                      Assign ({selectedStudents.length})
+                    </button>
+                  </div>
+                  <label className="flex items-center gap-2 text-xs cursor-pointer">
+                    <input type="checkbox" checked={faFilter.unassignedOnly}
+                      onChange={(e) => setFaFilter(prev => ({ ...prev, unassignedOnly: e.target.checked }))}
+                      className="w-3 h-3 rounded" />
+                    <span className="font-semibold">Unassigned Only</span>
+                  </label>
+                </div>
+
+                {/* Students List */}
+                <div className="glass-card rounded-2xl border-2 overflow-hidden">
+                  <div className="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
+                    {filteredStudents.length === 0 ? (
+                      <div className="p-4 text-center text-text-muted text-sm">No students match filter</div>
                     ) : (
-                      <p className="text-xs text-text-muted italic">No active sections currently registered.</p>
+                      filteredStudents.map((s) => (
+                        <button key={s.STUDENT_ID} onClick={() => toggleStudent(s.STUDENT_ID)} className={`w-full p-3 hover:bg-white/5 text-left text-xs transition-colors ${selectedStudents.includes(s.STUDENT_ID) ? 'bg-primary/20' : ''}`}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <input type="checkbox" checked={selectedStudents.includes(s.STUDENT_ID)} readOnly className="w-3 h-3 rounded accent-primary cursor-pointer" />
+                            <p className="font-bold text-text-main flex-1">{s.FIRST_NAME} {s.LAST_NAME}</p>
+                            {s.FA_NAME && <span className="bg-success/30 text-success px-1.5 py-0.5 rounded text-[10px] font-bold">{s.FA_NAME}</span>}
+                          </div>
+                          <p className="text-text-muted">{s.EMAIL}</p>
+                        </button>
+                      ))
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Recent Registrations */}
-            <h3 className="mb-4 text-lg font-semibold text-text-main animate-fade-in-up">Recent Registrations</h3>
-            {loading ? (
-              <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="skeleton h-10 rounded-lg" />)}</div>
-            ) : (
-              <div className="glass-card overflow-x-auto !p-0 animate-fade-in-up">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-left text-text-muted">
-                      <th className="px-4 py-3">Student</th>
-                      <th className="px-4 py-3">Course</th>
-                      <th className="px-4 py-3">Type</th>
-                      <th className="px-4 py-3">Section</th>
-                      <th className="px-4 py-3">Semester</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Approval</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {registrations.slice(0, 20).map((r, i) => (
-                      <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-2 text-text-main font-medium">{r.STUDENT_NAME}</td>
-                        <td className="px-4 py-2 text-primary-light font-bold">{r.COURSE_CODE}</td>
-                        <td className="px-4 py-2">
-                          <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
-                            r.COURSE_TYPE === 'PRACTICAL' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary-light'
-                          }`}>{r.COURSE_TYPE || 'THEORY'}</span>
-                        </td>
-                        <td className="px-4 py-2 text-text-muted">{r.SECTION_NAME}</td>
-                        <td className="px-4 py-2 text-text-muted">{r.SEMESTER}</td>
-                        <td className="px-4 py-2"><span className={`badge ${r.STATUS === 'ACTIVE' ? 'badge-present' : r.STATUS === 'PENDING' ? 'badge-pending' : 'badge-absent'}`}>{r.STATUS}</span></td>
-                        <td className="px-4 py-2"><span className={`badge ${r.APPROVAL_STATUS === 'APPROVED' ? 'badge-present' : r.APPROVAL_STATUS === 'PENDING' ? 'badge-pending' : 'badge-absent'}`}>{r.APPROVAL_STATUS}</span></td>
-                      </tr>
-                    ))}
-                    {registrations.length === 0 && (
-                      <tr>
-                        <td colSpan="7" className="text-center py-6 text-text-muted italic">No registrations to display</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
               </div>
-            )}
-          </>
-        )}
-
-        {/* ── People Tab ──────────────────────────────── */}
-        {tab === 'people' && (
-          <div className="animate-fade-in-up space-y-6">
-            <div className="glass-card !p-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-text-main">Faculty & Students</h3>
-                <p className="text-xs text-text-muted">Add/remove faculty and students. Default password for new accounts is <span className="font-semibold text-text-main">password123</span>.</p>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => setShowInstructorModal(true)} className="btn-primary !py-2 !px-3 text-xs">+ Add Faculty</button>
-                <button onClick={() => setShowStudentModal(true)} className="btn-primary !py-2 !px-3 text-xs">+ Add Student</button>
-              </div>
-            </div>
-
-            {/* Faculty Table */}
-            <div className="glass-card overflow-x-auto !p-0">
-              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-                <h4 className="font-semibold text-text-main">Faculty ({adminInstructors.length})</h4>
-              </div>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10 text-left text-text-muted">
-                    <th className="px-4 py-3">Name</th>
-                    <th className="px-4 py-3">Email</th>
-                    <th className="px-4 py-3">Designation</th>
-                    <th className="px-4 py-3 w-24">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {adminInstructors.map((i) => (
-                    <tr key={i.INSTRUCTOR_ID} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-2 text-text-main font-medium">{i.FIRST_NAME} {i.LAST_NAME}</td>
-                      <td className="px-4 py-2 text-text-muted">{i.EMAIL}</td>
-                      <td className="px-4 py-2 text-text-muted">{i.DESIGNATION}</td>
-                      <td className="px-4 py-2">
-                        <button
-                          onClick={() => handleDeleteInstructor(i.INSTRUCTOR_ID, `${i.FIRST_NAME} ${i.LAST_NAME}`)}
-                          className="btn-ghost !py-1 !px-2 text-xs text-warning"
-                        >
-                          🗑 Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {adminInstructors.length === 0 && (
-                    <tr><td colSpan="4" className="text-center py-6 text-text-muted italic">No faculty records.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Students Table */}
-            <div className="glass-card overflow-x-auto !p-0">
-              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-                <h4 className="font-semibold text-text-main">Students ({students.length})</h4>
-              </div>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10 text-left text-text-muted">
-                    <th className="px-4 py-3">Enrollment No.</th>
-                    <th className="px-4 py-3">Student</th>
-                    <th className="px-4 py-3">Email</th>
-                    <th className="px-4 py-3">Dept</th>
-                    <th className="px-4 py-3">Admission Year</th>
-                    <th className="px-4 py-3">Sem</th>
-                    <th className="px-4 py-3 w-24">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((s) => (
-                    <tr key={s.STUDENT_ID} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-2 text-primary-light font-mono font-semibold">{s.ENROLLMENT_NUMBER || '-'}</td>
-                      <td className="px-4 py-2 text-text-main font-medium">{s.FIRST_NAME} {s.LAST_NAME}</td>
-                      <td className="px-4 py-2 text-text-muted">{s.EMAIL}</td>
-                      <td className="px-4 py-2 text-text-muted">{s.DEPT_CODE || '-'}</td>
-                      <td className="px-4 py-2 text-text-muted">{s.ADMISSION_YEAR || '-'}</td>
-                      <td className="px-4 py-2 text-text-muted">{s.SEMESTER || '-'}</td>
-                      <td className="px-4 py-2">
-                        <button
-                          onClick={() => handleDeleteStudent(s.STUDENT_ID, `${s.FIRST_NAME} ${s.LAST_NAME}`)}
-                          className="btn-ghost !py-1 !px-2 text-xs text-warning"
-                        >
-                          🗑 Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {students.length === 0 && (
-                    <tr><td colSpan="7" className="text-center py-6 text-text-muted italic">No student records.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* ── Batch Coordinator Assignment Tab ──────────────────────────── */}
-        {tab === 'fa-assignment' && (
-          <div className="animate-fade-in-up">
-            <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-text-muted">
-              <p className="font-semibold text-primary-light mb-1">👨‍🏫 Batch Coordinator Assignment</p>
-              <p className="text-xs">Assign Batch Coordinators to students. The Batch Coordinator will be responsible for approving course registrations. Select students and choose an instructor to assign.</p>
-            </div>
-
-            {/* Filters & Action Bar */}
-            <div className="glass-card mb-4 !p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-                <div>
-                  <label className="mb-1 block text-xs text-text-muted">Filter by Department</label>
-                  <select className="input-field !py-2" value={faFilter.dept} onChange={(e) => setFaFilter(prev => ({ ...prev, dept: e.target.value }))}>
-                    <option value="">All Departments</option>
-                    {[...new Set(students.map(s => s.DEPT_NAME))].sort().map(d => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs text-text-muted">
-                    <input type="checkbox" checked={faFilter.unassignedOnly}
-                      onChange={(e) => setFaFilter(prev => ({ ...prev, unassignedOnly: e.target.checked }))}
-                      className="w-4 h-4 rounded border-white/20 bg-white/5 accent-primary" />
-                    Unassigned only
-                  </label>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-text-muted">Assign Coordinator to Selected</label>
-                  <select className="input-field !py-2" value={selectedFA} onChange={(e) => setSelectedFA(e.target.value)}>
-                    <option value="">Select Instructor</option>
-                    {instructors.map(inst => (
-                      <option key={inst.INSTRUCTOR_ID} value={inst.INSTRUCTOR_ID}>
-                        {inst.INSTRUCTOR_NAME}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={selectAllFiltered} className="btn-ghost !py-2 text-xs flex-1">Select All ({filteredStudents.length})</button>
-                  <button onClick={handleAssignFA}
-                    disabled={faActionLoading || selectedStudents.length === 0 || !selectedFA}
-                    className="btn-primary !py-2 text-xs flex-1 disabled:opacity-50">
-                    {faActionLoading ? '...' : `Assign (${selectedStudents.length})`}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Students Table */}
-            <div className="glass-card overflow-x-auto !p-0">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10 text-left text-text-muted">
-                    <th className="px-4 py-3 w-10">
-                      <input type="checkbox"
-                        checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
-                        onChange={(e) => e.target.checked ? selectAllFiltered() : setSelectedStudents([])}
-                        className="w-4 h-4 rounded border-white/20 bg-white/5 accent-primary cursor-pointer" />
-                    </th>
-                    <th className="px-4 py-3">Student</th>
-                    <th className="px-4 py-3">Department</th>
-                    <th className="px-4 py-3">Year / Sem</th>
-                    <th className="px-4 py-3">Current Coordinator</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredStudents.map((s) => (
-                    <tr key={s.STUDENT_ID}
-                      className={`border-b border-white/5 transition-colors cursor-pointer ${
-                        selectedStudents.includes(s.STUDENT_ID) ? 'bg-primary/10' : 'hover:bg-white/5'
-                      }`}
-                      onClick={() => toggleStudent(s.STUDENT_ID)}>
-                      <td className="px-4 py-2">
-                        <input type="checkbox" checked={selectedStudents.includes(s.STUDENT_ID)}
-                          onChange={() => toggleStudent(s.STUDENT_ID)}
-                          className="w-4 h-4 rounded border-white/20 bg-white/5 accent-primary cursor-pointer" />
-                      </td>
-                      <td className="px-4 py-2">
-                        <p className="font-medium text-text-main">{s.FIRST_NAME} {s.LAST_NAME}</p>
-                        <p className="text-xs text-text-muted">{s.EMAIL}</p>
-                      </td>
-                      <td className="px-4 py-2 text-text-muted">{s.DEPT_NAME}</td>
-                      <td className="px-4 py-2 text-text-muted">{s.ENROLLMENT_NUMBER || '-'} / Sem {s.SEMESTER}</td>
-                      <td className="px-4 py-2">
-                        {s.FA_NAME ? (
-                          <span className="rounded-md bg-success/15 px-2 py-1 text-xs text-success font-semibold">{s.FA_NAME}</span>
-                        ) : (
-                          <span className="rounded-md bg-warning/15 px-2 py-1 text-xs text-warning font-semibold">Not Assigned</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredStudents.length === 0 && (
-                    <tr>
-                      <td colSpan="5" className="text-center py-6 text-text-muted italic">No students match the filter.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* ── Section Assignment Tab ────────────────────────── */}
-        {tab === 'section-assignment' && (
-          <div className="animate-fade-in-up">
-            <div className="mb-4 rounded-xl border border-accent/20 bg-accent/5 p-4 text-sm text-text-muted">
-              <p className="font-semibold text-accent mb-1">📋 Section Assignment</p>
-              <p className="text-xs">Assign sections to student registrations that don't have a section yet. Students register for courses only; the admin assigns sections.</p>
-            </div>
-
-            {unassignedRegs.length === 0 ? (
-              <div className="glass-card text-center py-8">
-                <p className="text-text-muted">✅ All registrations have sections assigned.</p>
-              </div>
-            ) : (
-              <div className="glass-card overflow-x-auto !p-0">
-                <div className="px-4 py-3 border-b border-white/10">
-                  <h4 className="font-semibold text-text-main">Unassigned Registrations ({unassignedRegs.length})</h4>
-                </div>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-left text-text-muted">
-                      <th className="px-4 py-3">Student</th>
-                      <th className="px-4 py-3">Course</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Assign Section</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {unassignedRegs.map((reg) => (
-                      <tr key={reg.REGISTRATION_ID} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-2">
-                          <span className="font-mono text-primary-light text-xs">{reg.ENROLLMENT_NUMBER}</span>
-                          <span className="ml-2 text-text-main">{reg.FIRST_NAME} {reg.LAST_NAME}</span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className="font-semibold text-text-main">{reg.COURSE_CODE}</span>
-                          <span className="ml-1 text-text-muted text-xs">{reg.COURSE_NAME}</span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className={`badge ${reg.STATUS === 'ACTIVE' ? 'badge-present' : 'badge-pending'}`}>{reg.STATUS}</span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <div className="flex items-center gap-2">
-                            <select
-                              className="input-field !py-1 !px-2 !mb-0 text-xs min-w-[120px] appearance-none bg-surface"
-                              defaultValue=""
-                              onChange={(e) => handleAssignSection(reg.REGISTRATION_ID, e.target.value)}
-                              disabled={assignLoading === reg.REGISTRATION_ID}
-                            >
-                              <option value="" disabled>Select section</option>
-                              {(sectionOptions[reg.COURSE_ID] || []).map(sec => (
-                                <option key={sec.SECTION_ID} value={sec.SECTION_ID}>Sec {sec.SECTION_NAME} - {sec.ROOM || 'TBA'}</option>
-                              ))}
-                            </select>
-                            {assignLoading === reg.REGISTRATION_ID && <span className="text-xs text-text-muted">Assigning...</span>}
+            ) : tab === 'section-assignment' ? (
+              <div className="animate-fade-in-up">
+                <h3 className="text-lg font-bold text-text-main mb-4">Section Assignment</h3>
+                
+                {unassignedRegs.length === 0 ? (
+                  <div className="glass-card text-center py-12 rounded-3xl border-2">
+                    <p className="text-lg text-text-muted font-bold">✅ All registrations assigned!</p>
+                  </div>
+                ) : (
+                  <div className="glass-card rounded-2xl border-2 overflow-hidden">
+                    <div className="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
+                      {unassignedRegs.map((reg) => (
+                        <div key={reg.REGISTRATION_ID} className="p-3 hover:bg-white/5 text-xs">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex-1">
+                              <p className="font-bold text-text-main">{reg.FIRST_NAME} {reg.LAST_NAME}</p>
+                              <p className="text-text-muted">{reg.COURSE_CODE}</p>
+                            </div>
+                            <span className={`badge ${reg.STATUS === 'ACTIVE' ? 'badge-present' : 'badge-pending'}`}>{reg.STATUS}</span>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          <select
+                            className="input-field !text-xs !py-1.5"
+                            defaultValue=""
+                            onChange={(e) => handleAssignSection(reg.REGISTRATION_ID, e.target.value)}
+                            disabled={assignLoading === reg.REGISTRATION_ID}
+                          >
+                            <option value="">Select section</option>
+                            {(sectionOptions[reg.COURSE_ID] || []).map(sec => (
+                              <option key={sec.SECTION_ID} value={sec.SECTION_ID}>Sec {sec.SECTION_NAME} - {sec.ROOM || 'TBA'}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {message && (
+              <div className="mt-4 p-3 rounded-2xl bg-success/20 text-success text-sm font-bold border-2 border-success/40 animate-fade-in-up">
+                ✅ {message}
               </div>
             )}
           </div>
-        )}
+        </div>
       </main>
 
       {/* Add Course Modal */}
@@ -866,6 +748,10 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div>
+                <label className="mb-1.5 block text-sm font-medium text-text-muted">Target Semester (Academic Semester 1-8)</label>
+                <input type="number" min="1" max="8" className="input-field" value={newCourse.targetSemester} onChange={(e) => setNewCourse({...newCourse, targetSemester: e.target.value})} required />
+              </div>
+              <div>
                 <label className="mb-1.5 block text-sm font-medium text-text-muted">Description (Optional)</label>
                 <textarea className="input-field min-h-[80px] resize-none" placeholder="Course overview..." value={newCourse.description} onChange={(e) => setNewCourse({...newCourse, description: e.target.value})} maxLength={1000}></textarea>
               </div>
@@ -895,7 +781,10 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-text-muted">Semester</label>
-                  <input type="text" className="input-field" placeholder="e.g. ODD-2025" value={newSection.semester} onChange={(e) => setNewSection({...newSection, semester: e.target.value})} required maxLength={20} />
+                  <select className="input-field appearance-none bg-surface" value={newSection.semester} onChange={(e) => setNewSection({...newSection, semester: e.target.value})} required>
+                    <option value="">Select Semester</option>
+                    {semesters.map(sem => <option key={sem.value} value={sem.value}>{sem.label}</option>)}
+                  </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

@@ -30,36 +30,37 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface px-4">
-      {/* Decorative gradient orbs */}
+    <div className="flex min-h-screen items-center justify-center px-4 relative overflow-hidden">
+      {/* Decorative gradient orbs - Tropical */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-primary/15 blur-[120px]" />
-        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-accent/15 blur-[120px]" />
+        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-primary/30 to-pink-400/30 blur-[120px] animate-float" />
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-orange-400/30 to-yellow-300/30 blur-[120px] animate-float" />
+        <div className="absolute top-1/3 left-1/3 h-[400px] w-[400px] rounded-full bg-gradient-to-r from-accent/20 to-cyan-300/20 blur-[100px] animate-pulse-glow" />
       </div>
 
-      <div className="animate-fade-in-up relative w-full max-w-md">
+      <div className="animate-fade-in-up relative w-full max-w-lg z-10">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-2xl font-bold text-white shadow-xl">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary via-pink-500 to-orange-400 text-3xl font-bold text-white shadow-lg animate-pulse-glow">
             U
           </div>
-          <h1 className="text-3xl font-bold text-text-main">UniTrack</h1>
-          <p className="mt-1 text-text-muted">Student Registration & Attendance Portal</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">UniTrack</h1>
+          <p className="mt-2 text-text-muted font-semibold">Student Registration & Attendance Portal</p>
         </div>
 
         {/* Card */}
         <div className="glass-card">
           {/* Role Toggle */}
-          <div className="mb-6 flex overflow-hidden rounded-xl border border-white/10 bg-surface p-1">
+          <div className="mb-6 flex overflow-hidden rounded-2xl border-2 border-primary/40 bg-white p-1.5">
             {[{ key: 'student', label: 'Student' }, { key: 'instructor', label: 'Faculty' }, { key: 'admin', label: 'Admin' }].map((r) => (
               <button
                 key={r.key}
                 type="button"
                 onClick={() => setRole(r.key)}
-                className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-200 ${
+                className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-200 ${
                   role === r.key
-                    ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
-                    : 'text-text-muted hover:text-text-main'
+                    ? 'bg-gradient-to-r from-primary via-pink-500 to-orange-400 text-white shadow-md scale-105'
+                    : 'text-text-main hover:bg-primary/10'
                 }`}
                 id={`role-toggle-${r.key}`}
               >
@@ -71,13 +72,13 @@ export default function Login() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-text-muted" htmlFor="email-input">
+              <label className="mb-2 block text-sm font-bold text-text-main" htmlFor="email-input">
                 Email Address
               </label>
               <input
                 id="email-input"
                 type="email"
-                className="input-field"
+                className="input-field text-center"
                 placeholder={role === 'student' ? 'student@university.edu' : role === 'instructor' ? 'faculty@university.edu' : 'admin@university.edu'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -85,13 +86,13 @@ export default function Login() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-text-muted" htmlFor="password-input">
+              <label className="mb-2 block text-sm font-bold text-text-main" htmlFor="password-input">
                 Password
               </label>
               <input
                 id="password-input"
                 type="password"
-                className="input-field"
+                className="input-field text-center"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -100,7 +101,7 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
+              <div className="rounded-2xl bg-danger/20 border-2 border-danger/40 px-4 py-3 text-sm font-semibold text-red-700" role="alert">
                 {error}
               </div>
             )}

@@ -36,7 +36,7 @@ const authLimiter = rateLimit({
 });
 const apiLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,  // 1 minute
-  max: 120,                  // 120 requests per minute
+  max: 500,                  // 500 requests per minute (increased for development)
   message: { error: 'Rate limit exceeded. Please slow down.' },
   standardHeaders: true,
   legacyHeaders: false,

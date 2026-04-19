@@ -181,14 +181,8 @@ router.get('/courses', verifyToken, authorize('admin'), async (_req, res) => {
        LEFT JOIN SECTION s ON s.course_id = c.course_id AND (:sem IS NULL OR s.session_code = :sem)
        LEFT JOIN SECTION_COORDINATOR sc ON sc.section_id = s.section_id
        LEFT JOIN INSTRUCTOR i ON i.instructor_id = sc.instructor_id
-       WHERE EXISTS (
-         SELECT 1 FROM COURSE_OFFERED_SEMESTER cos
-         JOIN ACADEMIC_SESSION acs ON acs.session_code = cos.session_code
-         WHERE cos.course_id = c.course_id
-         AND (:sem2 IS NULL OR cos.session_code = :sem2)
-       )
        ORDER BY c.course_code, s.session_code, s.section_name`,
-      { sem: activeSem, sem2: activeSem },
+      { sem: activeSem },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
     return res.json(result.rows);
@@ -229,15 +223,20 @@ router.get('/registrations', verifyToken, authorize('admin'), async (_req, res) 
 
 // POST /api/admin/courses — create a new course
 router.post('/courses', verifyToken, authorize('admin'), async (req, res) => {
-  const { courseCode, courseName, deptId, credits, description, courseType } = req.body;
+  const { courseCode, courseName, deptId, credits, description, courseType, targetSemester } = req.body;
 
-  if (!courseCode || !courseName || !deptId || !credits) {
-    return res.status(400).json({ error: 'Course Code, Name, Department, and Credits are required.' });
+  if (!courseCode || !courseName || !deptId || !credits || targetSemester === undefined || targetSemester === null) {
+    return res.status(400).json({ error: 'Course Code, Name, Department, Credits, and Target Semester are required.' });
   }
 
   const cType = (courseType || 'THEORY').toUpperCase();
   if (!['THEORY', 'PRACTICAL'].includes(cType)) {
     return res.status(400).json({ error: 'courseType must be THEORY or PRACTICAL.' });
+  }
+
+  const semNum = Number(targetSemester);
+  if (isNaN(semNum) || semNum < 1 || semNum > 8) {
+    return res.status(400).json({ error: 'targetSemester must be a number between 1 and 8.' });
   }
 
   let conn;
@@ -256,15 +255,31 @@ router.post('/courses', verifyToken, authorize('admin'), async (req, res) => {
         ctype: cType,
         id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
       },
-      { autoCommit: true }
+      { autoCommit: false }
     );
+    const newCourseId = result.outBinds.id[0];
+
+    // Insert into COURSE_OFFERED_SEMESTER
+    await conn.execute(
+      `INSERT INTO COURSE_OFFERED_SEMESTER (course_id, semester_number)
+       VALUES (:cid, :sem)`,
+      { cid: newCourseId, sem: semNum },
+      { autoCommit: false }
+    );
+
+    await conn.execute('COMMIT');
+
     return res.status(201).json({
       message: 'Course created successfully.',
-      courseId: result.outBinds.id[0]
+      courseId: newCourseId
     });
   } catch (err) {
     console.error('Create course error:', err);
+    if (conn) await conn.execute('ROLLBACK');
     if (err.errorNum === 1) {
+      if (err.message.includes('COURSE_OFFERED_SEMESTER')) {
+        return res.status(409).json({ error: 'Course already offered in this semester.' });
+      }
       return res.status(409).json({ error: 'Course code already exists.' });
     }
     if (err.errorNum === 2290 && err.message.includes('CHK_COURSE_CREDITS')) {
