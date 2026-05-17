@@ -225,7 +225,7 @@ export default function FacultyDashboard() {
             {/* Header */}
             <div className="glass-card rounded-3xl border-2 text-center">
               <div className="text-4xl mb-2">🎓</div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Faculty Dashboard</h2>
+              <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">Faculty Dashboard</h2>
               <p className="text-xs text-text-muted mt-2 font-semibold">Attendance & Approvals</p>
             </div>
 
@@ -235,8 +235,8 @@ export default function FacultyDashboard() {
                 onClick={() => setTab('attendance')}
                 className={`w-full text-left px-6 py-4 text-sm font-bold border-b transition-all ${
                   tab === 'attendance'
-                    ? 'bg-gradient-to-r from-primary via-pink-500 to-orange-400 text-white'
-                    : 'text-text-main hover:bg-primary/5'
+                    ? 'bg-primary text-gray-900'
+                    : 'text-text-main hover:bg-gray-700/40'
                 }`}
                 id="attendance-tab"
               >
@@ -246,8 +246,8 @@ export default function FacultyDashboard() {
                 onClick={() => setTab('approvals')}
                 className={`w-full text-left px-6 py-4 text-sm font-bold transition-all ${
                   tab === 'approvals'
-                    ? 'bg-gradient-to-r from-primary via-pink-500 to-orange-400 text-white'
-                    : 'text-text-main hover:bg-primary/5'
+                    ? 'bg-primary text-gray-900'
+                    : 'text-text-main hover:bg-gray-700/40'
                 }`}
                 id="approvals-tab"
               >
@@ -304,7 +304,7 @@ export default function FacultyDashboard() {
                 )}
 
                 {selectedSectionInfo && (
-                  <div className="glass-card rounded-2xl border-2 p-3 bg-cyan-50/50 border-cyan-300/40">
+                  <div className="glass-card rounded-2xl border-2 p-3 border-accent/20">
                     <p className="text-[11px] font-bold text-text-muted mb-2 uppercase">📍 Section Info</p>
                     <p className="text-xs font-bold text-text-main mb-1">{selectedSectionInfo.COURSE_NAME}</p>
                     <p className="text-[10px] text-text-muted">Room: {selectedSectionInfo.ROOM}</p>
@@ -392,7 +392,7 @@ export default function FacultyDashboard() {
                                 className={`rounded px-2 py-1.5 text-[11px] font-bold border transition-all ${
                                   attendanceState[stu.STUDENT_ID] === opt 
                                     ? statusColors[opt] + ' border-current' 
-                                    : 'border-white/20 text-text-muted hover:border-white/40'
+                                    : 'border-gray-600 text-text-muted hover:border-gray-500'
                                 }`}
                               >
                                 {opt === 'PRESENT' ? '✓' : opt === 'ABSENT' ? '✕' : '⊘'}
@@ -448,7 +448,7 @@ export default function FacultyDashboard() {
                               <div key={group.studentId} className="glass-card rounded-2xl border-2 p-4 animate-fade-in-up">
                                 <div className="flex items-start justify-between mb-3">
                                   <div className="flex items-center gap-3">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-sm font-bold text-white">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-sm font-bold text-primary">
                                       {group.firstName?.[0]}{group.lastName?.[0]}
                                     </div>
                                     <div>
@@ -468,7 +468,7 @@ export default function FacultyDashboard() {
 
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                   {group.courses.map((c) => (
-                                    <div key={c.REGISTRATION_ID} className="bg-white/5 rounded-lg p-2 border border-white/10">
+                                    <div key={c.REGISTRATION_ID} className="bg-gray-800/60 rounded-lg p-2 border border-gray-700/50">
                                       <p className="font-bold text-text-main">{c.COURSE_CODE}</p>
                                       <p className="text-[10px] text-text-muted">{c.COURSE_NAME}</p>
                                       <div className="mt-1 flex gap-1">
@@ -500,7 +500,7 @@ export default function FacultyDashboard() {
                         <h3 className="text-lg font-bold text-text-main mb-3">Drop Requests ({pendingDrops.length})</h3>
                         <div className="space-y-2">
                           {pendingDrops.map((p) => (
-                            <div key={p.REGISTRATION_ID} className="glass-card rounded-2xl border-2 border-danger/30 p-3 animate-fade-in-up">
+                            <div key={p.REGISTRATION_ID} className="glass-card rounded-2xl border border-danger/20 p-3 animate-fade-in-up">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-danger/20 text-xs font-bold text-danger">
@@ -513,7 +513,7 @@ export default function FacultyDashboard() {
                                 </div>
                                 <div className="flex gap-1">
                                   <button onClick={() => handleApproveDrop(p.REGISTRATION_ID)} className="bg-danger/30 text-danger font-bold text-xs px-2 py-1 rounded hover:bg-danger/40">✓</button>
-                                  <button onClick={() => handleRejectDrop(p.REGISTRATION_ID)} className="bg-white/10 text-text-muted font-bold text-xs px-2 py-1 rounded hover:bg-white/20">✕</button>
+                                  <button onClick={() => handleRejectDrop(p.REGISTRATION_ID)} className="bg-gray-700/50 text-text-muted font-bold text-xs px-2 py-1 rounded hover:bg-gray-600/50">✕</button>
                                 </div>
                               </div>
                             </div>
@@ -544,7 +544,7 @@ export default function FacultyDashboard() {
               <>
                 {/* Basic Info */}
                 <div className="mb-4 flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-xl font-bold text-white">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 text-xl font-bold text-primary">
                     {studentDetail.profile.FIRST_NAME?.[0]}{studentDetail.profile.LAST_NAME?.[0]}
                   </div>
                   <div>
@@ -562,7 +562,7 @@ export default function FacultyDashboard() {
                     { label: 'Batch Coordinator', value: studentDetail.profile.FA_NAME || '—' },
                     { label: 'Phone', value: studentDetail.profile.PHONE || '—' },
                   ].map((item, i) => (
-                    <div key={i} className="rounded-xl bg-white/5 p-3">
+                    <div key={i} className="rounded-xl bg-gray-800/50 p-3">
                       <p className="text-xs text-text-muted">{item.label}</p>
                       <p className="text-sm font-semibold text-text-main">{item.value}</p>
                     </div>
@@ -573,7 +573,7 @@ export default function FacultyDashboard() {
                 <h5 className="mb-2 text-sm font-semibold text-text-main">Registered Courses ({studentDetail.registrations.length})</h5>
                 <div className="mb-4 space-y-1">
                   {studentDetail.registrations.map((r, i) => (
-                    <div key={i} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-xs">
+                    <div key={i} className="flex items-center justify-between rounded-lg bg-gray-800/50 px-3 py-2 text-xs">
                       <div className="flex items-center gap-2">
                         <span className={`inline-block w-2 h-2 rounded-full ${r.COURSE_TYPE === 'PRACTICAL' ? 'bg-accent' : 'bg-primary'}`}></span>
                         <span className="text-text-main">{r.COURSE_CODE} — {r.COURSE_NAME} (Sec {r.SECTION_NAME})</span>
@@ -590,11 +590,11 @@ export default function FacultyDashboard() {
                 {studentDetail.attendance.length > 0 ? (
                   <div className="max-h-40 overflow-y-auto space-y-1">
                     {studentDetail.attendance.slice(0, 20).map((a, i) => (
-                      <div key={i} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-1.5 text-xs">
+                      <div key={i} className="flex items-center justify-between rounded-lg bg-gray-800/50 px-3 py-1.5 text-xs">
                         <span className="text-text-muted">
                           {new Date(a.ATTENDANCE_DATE).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} — {a.COURSE_CODE}
                         </span>
-                        <span className={`badge ${a.STATUS === 'PRESENT' ? 'badge-present' : a.STATUS === 'ABSENT' ? 'badge-absent' : 'bg-white/10 text-white border-white/20'}`}>
+                        <span className={`badge ${a.STATUS === 'PRESENT' ? 'badge-present' : a.STATUS === 'ABSENT' ? 'badge-absent' : 'bg-gray-700/50 text-text-muted border-gray-600'}`}>
                           {a.STATUS}
                         </span>
                       </div>

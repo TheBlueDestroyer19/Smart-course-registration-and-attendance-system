@@ -349,9 +349,9 @@ export default function AdminDashboard() {
           {/* ── LEFT PANEL: Nav & Quick Stats ──────────────────── */}
           <div className="lg:col-span-1 space-y-6">
             {/* Header */}
-            <div className="glass-card rounded-3xl border-2 text-center">
+            <div className="glass-card rounded-3xl text-center">
               <div className="text-4xl mb-2">⚙️</div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">Admin Control</h2>
+              <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">Admin Control</h2>
               <p className="text-xs text-text-muted mt-2 font-semibold">System Management</p>
             </div>
 
@@ -366,10 +366,10 @@ export default function AdminDashboard() {
                 <button
                   key={t.key}
                   onClick={() => setTab(t.key)}
-                  className={`w-full text-left px-4 py-3 text-sm font-bold border-b transition-all last:border-b-0 ${
+                  className={`w-full text-left px-4 py-3 text-sm font-bold border-b border-gray-700/50 transition-all last:border-b-0 ${
                     tab === t.key
-                      ? 'bg-gradient-to-r from-primary via-pink-500 to-orange-400 text-white'
-                      : 'text-text-main hover:bg-primary/5'
+                      ? 'bg-primary text-gray-900'
+                      : 'text-text-main hover:bg-gray-700/40'
                   }`}
                 >
                   {t.label}
@@ -410,11 +410,11 @@ export default function AdminDashboard() {
                 <p className="text-xs font-bold text-text-muted mt-1">Courses</p>
               </div>
               <div className="glass-card rounded-2xl border-2 p-3">
-                <p className="text-2xl font-black text-cyan-700">{adminInstructors.length}</p>
+                <p className="text-2xl font-black text-accent">{adminInstructors.length}</p>
                 <p className="text-xs font-bold text-text-muted mt-1">Faculty</p>
               </div>
               <div className="glass-card rounded-2xl border-2 p-3">
-                <p className="text-2xl font-black text-orange-600">{students.length}</p>
+                <p className="text-2xl font-black text-warning">{students.length}</p>
                 <p className="text-xs font-bold text-text-muted mt-1">Students</p>
               </div>
             </div>
@@ -424,10 +424,10 @@ export default function AdminDashboard() {
               <button onClick={() => setShowCourseModal(true)} className="w-full btn-primary text-xs !py-2 flex justify-center items-center gap-1">
                 <span>+</span> Add Course
               </button>
-              <button onClick={() => setShowInstructorModal(true)} className="w-full bg-cyan-500/20 border-2 border-cyan-500/40 text-cyan-700 font-bold text-xs rounded-2xl py-2 hover:bg-cyan-500/30 transition-all">
+              <button onClick={() => setShowInstructorModal(true)} className="w-full bg-accent/15 border border-accent/30 text-accent font-bold text-xs rounded-2xl py-2 hover:bg-accent/25 transition-all">
                 + Add Faculty
               </button>
-              <button onClick={() => setShowStudentModal(true)} className="w-full bg-orange-500/20 border-2 border-orange-500/40 text-orange-700 font-bold text-xs rounded-2xl py-2 hover:bg-orange-500/30 transition-all">
+              <button onClick={() => setShowStudentModal(true)} className="w-full bg-warning/15 border border-warning/30 text-warning font-bold text-xs rounded-2xl py-2 hover:bg-warning/25 transition-all">
                 + Add Student
               </button>
             </div>
@@ -451,10 +451,10 @@ export default function AdminDashboard() {
                         <button
                           key={s.value}
                           onClick={() => handleSetSemester(s.value)}
-                          className={`rounded-lg text-xs font-bold px-3 py-1.5 border-2 transition-all ${
+                          className={`rounded-lg text-xs font-bold px-3 py-1.5 border transition-all ${
                             activeSemester === s.value
                               ? 'border-primary bg-primary/20 text-primary-light'
-                              : 'border-white/20 text-text-muted hover:border-primary/40'
+                              : 'border-gray-600 text-text-muted hover:border-primary/40'
                           }`}
                         >
                           {s.label}
@@ -472,38 +472,65 @@ export default function AdminDashboard() {
                       <div className="col-span-full text-center text-text-muted py-8">No courses</div>
                     ) : (
                       Object.values(courseGroups).map((cg) => (
-                        <div key={cg.code} className="glass-card rounded-2xl border-2 p-3 animate-fade-in-up">
-                          <div className="mb-2">
-                            <p className="font-bold text-text-main text-sm">{cg.code}</p>
-                            <p className="text-xs text-text-muted">{cg.name}</p>
+                        <div key={cg.code} className="glass-card rounded-2xl p-3 animate-fade-in-up">
+                          <div className="mb-2 flex items-start justify-between">
+                            <div>
+                              <p className="font-bold text-text-main text-sm">{cg.code}</p>
+                              <p className="text-xs text-text-muted">{cg.name}</p>
+                            </div>
+                            <div className="flex gap-1.5 flex-wrap justify-end">
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                cg.courseType === 'PRACTICAL' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary'
+                              }`}>
+                                {cg.courseType === 'PRACTICAL' ? '🔬 PRAC' : '📖 THY'}
+                              </span>
+                              <span className="text-[10px] bg-gray-700/60 text-text-muted px-1.5 py-0.5 rounded font-bold">{cg.credits}cr</span>
+                            </div>
                           </div>
-                          <div className="flex gap-2 mb-2 flex-wrap">
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              cg.courseType === 'PRACTICAL' ? 'bg-cyan-200/30 text-cyan-700' : 'bg-pink-200/30 text-primary'
-                            }`}>
-                              {cg.courseType === 'PRACTICAL' ? '🔬 PRAC' : '📖 THY'}
-                            </span>
-                            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-bold">{cg.credits}cr</span>
-                          </div>
-                          <p className="text-[10px] text-text-muted mb-2">{cg.sections.length} section(s)</p>
+
+                          {/* Section Details */}
+                          {cg.sections.length > 0 ? (
+                            <div className="space-y-1.5 mb-2">
+                              {cg.sections.map((sec) => (
+                                <div key={sec.SECTION_ID} className="flex items-center justify-between bg-gray-800/60 rounded-lg px-2.5 py-1.5 border border-gray-700/50 text-xs">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <span className="font-bold text-primary whitespace-nowrap">Sec {sec.SECTION_NAME}</span>
+                                    <span className="text-text-muted truncate">
+                                      {sec.COORDINATOR ? `• ${sec.COORDINATOR}` : '• Unassigned'}
+                                    </span>
+                                    {sec.ROOM && <span className="text-text-muted whitespace-nowrap hidden sm:inline">• {sec.ROOM}</span>}
+                                  </div>
+                                  <button
+                                    onClick={() => handleDeleteSection(sec.SECTION_ID, cg.code, sec.SECTION_NAME)}
+                                    className="text-danger/70 hover:text-danger hover:bg-danger/15 px-1.5 py-0.5 rounded text-[10px] font-bold transition-all ml-1 flex-shrink-0"
+                                  >
+                                    🗑
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-[10px] text-text-muted mb-2 italic">No sections yet</p>
+                          )}
+
                           <div className="flex gap-1">
                             <button
                               onClick={() => {
                                 const anyRow = cg.sections[0] || courses.find(c => c.COURSE_CODE === cg.code);
                                 handleDeleteCourse(anyRow?.COURSE_ID, cg.code);
                               }}
-                              className="flex-1 bg-danger/20 text-danger text-[10px] font-bold py-1 rounded hover:bg-danger/30"
+                              className="flex-1 bg-danger/15 text-danger text-[10px] font-bold py-1 rounded hover:bg-danger/25 transition-all"
                             >
-                              🗑 Delete
+                              🗑 Delete Course
                             </button>
                             <button 
                               onClick={() => {
                                 setNewSection({...newSection, courseId: cg.sections[0]?.COURSE_ID || courses.find(c => c.COURSE_CODE === cg.code).COURSE_ID, semester: activeSemester});
                                 setShowSectionModal(true);
                               }}
-                              className="flex-1 bg-primary/20 text-primary text-[10px] font-bold py-1 rounded hover:bg-primary/30"
+                              className="flex-1 bg-primary/15 text-primary text-[10px] font-bold py-1 rounded hover:bg-primary/25 transition-all"
                             >
-                              + Sec
+                              + Add Section
                             </button>
                           </div>
                         </div>
@@ -515,10 +542,10 @@ export default function AdminDashboard() {
                 {/* Recent Registrations */}
                 <div>
                   <h3 className="text-lg font-bold text-text-main mb-3">Latest Registrations</h3>
-                  <div className="glass-card rounded-2xl border-2 p-3 max-h-96 overflow-y-auto">
+                  <div className="glass-card rounded-2xl p-3 max-h-96 overflow-y-auto">
                     <div className="space-y-2">
                       {registrations.slice(0, 15).map((r, i) => (
-                        <div key={i} className="bg-white/5 rounded-lg p-2 border border-white/10 text-xs">
+                        <div key={i} className="bg-gray-800/60 rounded-lg p-2 border border-gray-700/50 text-xs">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <p className="font-bold text-text-main">{r.STUDENT_NAME}</p>
@@ -540,12 +567,12 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-lg font-bold text-text-main mb-3">Faculty ({adminInstructors.length})</h3>
                   <div className="glass-card rounded-2xl border-2 overflow-hidden">
-                    <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
+                    <div className="divide-y divide-gray-700/50 max-h-96 overflow-y-auto">
                       {adminInstructors.length === 0 ? (
                         <div className="p-4 text-center text-text-muted text-sm">No faculty</div>
                       ) : (
                         adminInstructors.map((i) => (
-                          <div key={i.INSTRUCTOR_ID} className="p-3 hover:bg-white/5 flex items-center justify-between">
+                          <div key={i.INSTRUCTOR_ID} className="p-3 hover:bg-gray-700/40 flex items-center justify-between">
                             <div className="flex-1">
                               <p className="text-sm font-bold text-text-main">{i.FIRST_NAME} {i.LAST_NAME}</p>
                               <p className="text-xs text-text-muted">{i.EMAIL}</p>
@@ -568,15 +595,15 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-lg font-bold text-text-main mb-3">Students ({students.length})</h3>
                   <div className="glass-card rounded-2xl border-2 overflow-hidden">
-                    <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
+                    <div className="divide-y divide-gray-700/50 max-h-96 overflow-y-auto">
                       {students.length === 0 ? (
                         <div className="p-4 text-center text-text-muted text-sm">No students</div>
                       ) : (
                         students.map((s) => (
-                          <div key={s.STUDENT_ID} className="p-3 hover:bg-white/5 text-xs">
+                          <div key={s.STUDENT_ID} className="p-3 hover:bg-gray-700/40 text-xs">
                             <div className="flex items-center justify-between mb-1">
                               <p className="font-bold text-text-main">{s.FIRST_NAME} {s.LAST_NAME}</p>
-                              <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-mono">{s.ENROLLMENT_NUMBER || '-'}</span>
+                              <span className="text-[10px] bg-gray-700/60 px-1.5 py-0.5 rounded font-mono text-text-muted">{s.ENROLLMENT_NUMBER || '-'}</span>
                             </div>
                             <p className="text-text-muted">{s.EMAIL}</p>
                             <button
@@ -626,17 +653,17 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Students List */}
-                <div className="glass-card rounded-2xl border-2 overflow-hidden">
-                  <div className="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
+                <div className="glass-card rounded-2xl overflow-hidden">
+                  <div className="divide-y divide-gray-700/50 max-h-[500px] overflow-y-auto">
                     {filteredStudents.length === 0 ? (
                       <div className="p-4 text-center text-text-muted text-sm">No students match filter</div>
                     ) : (
                       filteredStudents.map((s) => (
-                        <button key={s.STUDENT_ID} onClick={() => toggleStudent(s.STUDENT_ID)} className={`w-full p-3 hover:bg-white/5 text-left text-xs transition-colors ${selectedStudents.includes(s.STUDENT_ID) ? 'bg-primary/20' : ''}`}>
+                        <button key={s.STUDENT_ID} onClick={() => toggleStudent(s.STUDENT_ID)} className={`w-full p-3 hover:bg-gray-700/40 text-left text-xs transition-colors ${selectedStudents.includes(s.STUDENT_ID) ? 'bg-primary/15' : ''}`}>
                           <div className="flex items-center gap-2 mb-1">
                             <input type="checkbox" checked={selectedStudents.includes(s.STUDENT_ID)} readOnly className="w-3 h-3 rounded accent-primary cursor-pointer" />
                             <p className="font-bold text-text-main flex-1">{s.FIRST_NAME} {s.LAST_NAME}</p>
-                            {s.FA_NAME && <span className="bg-success/30 text-success px-1.5 py-0.5 rounded text-[10px] font-bold">{s.FA_NAME}</span>}
+                            {s.FA_NAME && <span className="bg-success/20 text-success px-1.5 py-0.5 rounded text-[10px] font-bold">{s.FA_NAME}</span>}
                           </div>
                           <p className="text-text-muted">{s.EMAIL}</p>
                         </button>
@@ -654,10 +681,10 @@ export default function AdminDashboard() {
                     <p className="text-lg text-text-muted font-bold">✅ All registrations assigned!</p>
                   </div>
                 ) : (
-                  <div className="glass-card rounded-2xl border-2 overflow-hidden">
-                    <div className="divide-y divide-white/10 max-h-[500px] overflow-y-auto">
+                  <div className="glass-card rounded-2xl overflow-hidden">
+                    <div className="divide-y divide-gray-700/50 max-h-[500px] overflow-y-auto">
                       {unassignedRegs.map((reg) => (
-                        <div key={reg.REGISTRATION_ID} className="p-3 hover:bg-white/5 text-xs">
+                        <div key={reg.REGISTRATION_ID} className="p-3 hover:bg-gray-700/40 text-xs">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex-1">
                               <p className="font-bold text-text-main">{reg.FIRST_NAME} {reg.LAST_NAME}</p>
@@ -685,7 +712,7 @@ export default function AdminDashboard() {
             ) : null}
 
             {message && (
-              <div className="mt-4 p-3 rounded-2xl bg-success/20 text-success text-sm font-bold border-2 border-success/40 animate-fade-in-up">
+              <div className="mt-4 p-3 rounded-2xl bg-success/15 text-success text-sm font-bold border border-success/30 animate-fade-in-up">
                 ✅ {message}
               </div>
             )}
@@ -696,7 +723,7 @@ export default function AdminDashboard() {
       {/* Add Course Modal */}
       {showCourseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#161b22] shadow-2xl p-6">
+          <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-text-main">Add New Course</h3>
               <button onClick={() => setShowCourseModal(false)} className="text-text-muted hover:text-white text-xl leading-none">&times;</button>
@@ -731,7 +758,7 @@ export default function AdminDashboard() {
                       className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all ${
                         newCourse.courseType === 'THEORY'
                           ? 'border-primary bg-primary/20 text-primary-light'
-                          : 'border-white/15 text-text-muted hover:border-white/30'
+                          : 'border-gray-600 text-text-muted hover:border-gray-500'
                       }`}>
                       📖 Theory
                     </button>
@@ -740,7 +767,7 @@ export default function AdminDashboard() {
                       className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all ${
                         newCourse.courseType === 'PRACTICAL'
                           ? 'border-accent bg-accent/20 text-accent'
-                          : 'border-white/15 text-text-muted hover:border-white/30'
+                          : 'border-gray-600 text-text-muted hover:border-gray-500'
                       }`}>
                       🔬 Practical
                     </button>
@@ -755,7 +782,7 @@ export default function AdminDashboard() {
                 <label className="mb-1.5 block text-sm font-medium text-text-muted">Description (Optional)</label>
                 <textarea className="input-field min-h-[80px] resize-none" placeholder="Course overview..." value={newCourse.description} onChange={(e) => setNewCourse({...newCourse, description: e.target.value})} maxLength={1000}></textarea>
               </div>
-              <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
+              <div className="mt-6 flex justify-end gap-3 border-t border-gray-700 pt-5">
                 <button type="button" onClick={() => setShowCourseModal(false)} className="btn-ghost">Cancel</button>
                 <button type="submit" className="btn-primary">Create Course</button>
               </div>
@@ -767,7 +794,7 @@ export default function AdminDashboard() {
       {/* Add Section Modal */}
       {showSectionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#161b22] shadow-2xl p-6">
+          <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-text-main">Add New Section</h3>
               <button onClick={() => setShowSectionModal(false)} className="text-text-muted hover:text-white text-xl leading-none">&times;</button>
@@ -808,7 +835,7 @@ export default function AdminDashboard() {
                   {instructors.map(inst => <option key={inst.INSTRUCTOR_ID} value={inst.INSTRUCTOR_ID}>{inst.INSTRUCTOR_NAME}</option>)}
                 </select>
               </div>
-              <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
+              <div className="mt-6 flex justify-end gap-3 border-t border-gray-700 pt-5">
                 <button type="button" onClick={() => setShowSectionModal(false)} className="btn-ghost">Cancel</button>
                 <button type="submit" className="btn-primary">Create Section</button>
               </div>
@@ -820,7 +847,7 @@ export default function AdminDashboard() {
       {/* Add Instructor Modal */}
       {showInstructorModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#161b22] shadow-2xl p-6">
+          <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-text-main">Add New Faculty</h3>
               <button onClick={() => setShowInstructorModal(false)} className="text-text-muted hover:text-white text-xl leading-none">&times;</button>
@@ -857,7 +884,7 @@ export default function AdminDashboard() {
                   <input type="text" className="input-field" value={newInstructor.phone} onChange={(e) => setNewInstructor({ ...newInstructor, phone: e.target.value })} />
                 </div>
               </div>
-              <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
+              <div className="mt-6 flex justify-end gap-3 border-t border-gray-700 pt-5">
                 <button type="button" onClick={() => setShowInstructorModal(false)} className="btn-ghost">Cancel</button>
                 <button type="submit" className="btn-primary">Create Faculty</button>
               </div>
@@ -869,7 +896,7 @@ export default function AdminDashboard() {
       {/* Add Student Modal */}
       {showStudentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#161b22] shadow-2xl p-6">
+          <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-text-main">Add New Student</h3>
               <button onClick={() => setShowStudentModal(false)} className="text-text-muted hover:text-white text-xl leading-none">&times;</button>
@@ -911,7 +938,7 @@ export default function AdminDashboard() {
                   <input type="date" className="input-field" value={newStudent.dob} onChange={(e) => setNewStudent({ ...newStudent, dob: e.target.value })} />
                 </div>
               </div>
-              <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
+              <div className="mt-6 flex justify-end gap-3 border-t border-gray-700 pt-5">
                 <button type="button" onClick={() => setShowStudentModal(false)} className="btn-ghost">Cancel</button>
                 <button type="submit" className="btn-primary">Create Student</button>
               </div>

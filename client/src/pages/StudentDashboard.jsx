@@ -166,7 +166,7 @@ export default function StudentDashboard() {
   };
 
   const statusBadge = (status) => {
-    const map = { PRESENT: 'badge-present', ABSENT: 'badge-absent', CANCELLED: 'bg-white/10 text-white border-white/20' };
+    const map = { PRESENT: 'badge-present', ABSENT: 'badge-absent', CANCELLED: 'bg-gray-700/50 text-text-muted border-gray-600' };
     return map[status] || '';
   };
 
@@ -222,7 +222,7 @@ export default function StudentDashboard() {
             <div className="glass-card rounded-3xl border-2">
               <div className="text-center">
                 <div className="text-5xl mb-2">👋</div>
-                <h2 className="text-xl font-black bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">{user.firstName}!</h2>
+                <h2 className="text-xl font-black bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">{user.firstName}!</h2>
                 <p className="text-xs text-text-muted font-semibold mt-2">Welcome back to your academic portal</p>
               </div>
             </div>
@@ -230,9 +230,9 @@ export default function StudentDashboard() {
             {/* Status Summary */}
             {statusSummary && statusSummary.status !== 'NOT_REGISTERED' && statusSummary.status !== 'NO_SEMESTER' && (
               <div className={`rounded-3xl border-2 p-4 animate-fade-in-up ${
-                statusSummary.status === 'APPROVED' ? 'border-success/40 bg-gradient-to-br from-green-50 to-green-100/50' :
-                statusSummary.status === 'PENDING' ? 'border-warning/40 bg-gradient-to-br from-yellow-50 to-orange-100/50' :
-                'border-primary/40 bg-gradient-to-br from-pink-50 to-orange-50'
+                statusSummary.status === 'APPROVED' ? 'border-success/30 bg-success/10' :
+                statusSummary.status === 'PENDING' ? 'border-warning/30 bg-warning/10' :
+                'border-primary/30 bg-primary/10'
               }`}>
                 <div className="text-center">
                   <span className="text-3xl mb-2 block">
@@ -256,21 +256,21 @@ export default function StudentDashboard() {
             {/* Quick Stats */}
             <div className="space-y-3">
               <div className="glass-card rounded-2xl border-2 p-4 text-center">
-                <p className="text-2xl font-black bg-gradient-to-r from-pink-400 to-pink-500 bg-clip-text text-transparent">{activeRegs.length}</p>
+                <p className="text-2xl font-black text-primary">{activeRegs.length}</p>
                 <p className="text-xs font-bold text-text-muted mt-1">Active Courses</p>
               </div>
               <div className="glass-card rounded-2xl border-2 p-4 text-center">
-                <p className="text-2xl font-black bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">{pendingRegs.length}</p>
+                <p className="text-2xl font-black text-warning">{pendingRegs.length}</p>
                 <p className="text-xs font-bold text-text-muted mt-1">Pending Approval</p>
               </div>
               <div className="glass-card rounded-2xl border-2 p-4 text-center">
-                <p className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent">
+                <p className="text-2xl font-black text-accent">
                   {activeRegs.reduce((a, r) => a + (r.CREDITS || 0), 0)}
                 </p>
                 <p className="text-xs font-bold text-text-muted mt-1">Total Credits</p>
               </div>
               <div className="glass-card rounded-2xl border-2 p-4 text-center">
-                <p className="text-2xl font-black bg-gradient-to-r from-purple-400 to-purple-500 bg-clip-text text-transparent">
+                <p className="text-2xl font-black text-emerald-400">
                   {(() => { const vals = Object.values(attendanceMap).filter(v => v !== null); return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(0) : '—'; })()}%
                 </p>
                 <p className="text-xs font-bold text-text-muted mt-1">Avg Attendance</p>
@@ -279,7 +279,7 @@ export default function StudentDashboard() {
 
             {/* Semester Info */}
             {semester && (
-              <div className="glass-card rounded-2xl border-2 p-4 text-center bg-gradient-to-br from-accent/10 to-cyan-100/10">
+              <div className="glass-card rounded-2xl border-2 p-4 text-center">
                 <p className="text-lg font-black text-accent">📅</p>
                 <p className="text-sm font-bold text-text-main mt-2">{semester}</p>
                 <p className="text-xs text-text-muted font-semibold mt-1">Active Semester</p>
@@ -318,7 +318,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Instructions */}
-                <div className="mb-4 rounded-2xl bg-yellow-100/50 border-2 border-warning/40 p-3 text-xs text-text-main space-y-1">
+                <div className="mb-4 rounded-2xl bg-warning/10 border border-warning/30 p-3 text-xs text-text-main space-y-1">
                   <p>✓ Select up to <strong>6 Theory</strong> + <strong>4 Practical</strong> courses</p>
                   <p>✓ Submit for Batch Coordinator approval</p>
                 </div>
@@ -326,13 +326,13 @@ export default function StudentDashboard() {
                 {/* Counters */}
                 <div className="mb-4 grid grid-cols-2 gap-3">
                   <div className={`rounded-2xl px-3 py-2 text-center border-2 text-xs font-bold ${
-                    (existingTheory + cartTheory) > 6 ? 'border-danger/60 bg-red-100 text-red-700' : 'border-primary/40 bg-pink-50 text-primary'
+                    (existingTheory + cartTheory) > 6 ? 'border-danger/40 bg-danger/10 text-danger' : 'border-primary/30 bg-primary/10 text-primary'
                   }`}>
                     <p className="text-lg">📖</p>
                     <p className="mt-1">{existingTheory + cartTheory}/6 Theory</p>
                   </div>
                   <div className={`rounded-2xl px-3 py-2 text-center border-2 text-xs font-bold ${
-                    (existingPractical + cartPractical) > 4 ? 'border-danger/60 bg-red-100 text-red-700' : 'border-cyan-400/40 bg-cyan-50 text-cyan-700'
+                    (existingPractical + cartPractical) > 4 ? 'border-danger/40 bg-danger/10 text-danger' : 'border-accent/30 bg-accent/10 text-accent'
                   }`}>
                     <p className="text-lg">🔬</p>
                     <p className="mt-1">{existingPractical + cartPractical}/4 Practical</p>
@@ -342,7 +342,7 @@ export default function StudentDashboard() {
                 {/* Theory Courses */}
                 {theoryCourses.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs font-bold text-primary mb-2 bg-pink-50 rounded-lg p-2">📖 THEORY COURSES</p>
+                    <p className="text-xs font-bold text-primary mb-2 bg-primary/10 rounded-lg p-2">📖 THEORY COURSES</p>
                     <div className="space-y-2">
                       {theoryCourses.map(course => {
                         const alreadyRegistered = currentSemRegs.some(r => r.COURSE_CODE === course.COURSE_CODE);
@@ -359,7 +359,7 @@ export default function StudentDashboard() {
                 {/* Practical Courses */}
                 {practicalCourses.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs font-bold text-cyan-700 mb-2 bg-cyan-50 rounded-lg p-2">🔬 PRACTICAL COURSES</p>
+                    <p className="text-xs font-bold text-accent mb-2 bg-accent/10 rounded-lg p-2">🔬 PRACTICAL COURSES</p>
                     <div className="space-y-2">
                       {practicalCourses.map(course => {
                         const alreadyRegistered = currentSemRegs.some(r => r.COURSE_CODE === course.COURSE_CODE);
@@ -375,11 +375,11 @@ export default function StudentDashboard() {
 
                 {/* Selected Courses & Submit */}
                 {Object.keys(cart).length > 0 && (
-                  <div className="mt-4 rounded-2xl bg-pink-50 border-2 border-primary/40 p-3">
+                  <div className="mt-4 rounded-2xl bg-primary/10 border border-primary/30 p-3">
                     <p className="text-xs font-bold text-text-main mb-2">✓ SELECTED ({Object.keys(cart).length})</p>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {Object.values(cart).map(item => (
-                        <span key={item.courseId} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-pink-100 to-orange-100 border border-primary/30 px-2.5 py-1 text-xs font-semibold">
+                        <span key={item.courseId} className="flex items-center gap-1.5 rounded-lg bg-gray-800/60 border border-gray-700/50 px-2.5 py-1 text-xs font-semibold">
                           <strong>{item.courseCode}</strong>
                           <button onClick={() => removeFromCart(item.courseId)} className="text-danger hover:text-danger/80 font-bold">✕</button>
                         </span>
@@ -391,8 +391,8 @@ export default function StudentDashboard() {
                   </div>
                 )}
 
-                {regError && <p className="mt-2 text-xs font-bold text-red-700 bg-red-100 rounded-lg p-2">{regError}</p>}
-                {regSuccess && <p className="mt-2 text-xs font-bold text-green-700 bg-green-100 rounded-lg p-2">✅ {regSuccess}</p>}
+                {regError && <p className="mt-2 text-xs font-bold text-danger bg-danger/10 rounded-lg p-2">{regError}</p>}
+                {regSuccess && <p className="mt-2 text-xs font-bold text-success bg-success/10 rounded-lg p-2">✅ {regSuccess}</p>}
               </div>
             )}
 
@@ -421,9 +421,9 @@ export default function StudentDashboard() {
                       <div className="mb-3 flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-sm bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">{reg.COURSE_CODE}</h4>
+                            <h4 className="font-bold text-sm bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">{reg.COURSE_CODE}</h4>
                             <span className={`text-[10px] font-bold rounded px-1.5 py-0.5 ${
-                              reg.COURSE_TYPE === 'PRACTICAL' ? 'bg-cyan-100 text-cyan-700' : 'bg-pink-100 text-primary'
+                              reg.COURSE_TYPE === 'PRACTICAL' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary'
                             }`}>
                               {reg.COURSE_TYPE === 'PRACTICAL' ? 'PRAC' : 'THY'}
                             </span>
@@ -441,16 +441,16 @@ export default function StudentDashboard() {
 
                       {/* Info Grid */}
                       <div className="mb-3 grid grid-cols-3 gap-2 text-[10px]">
-                        <div className="rounded-lg bg-pink-50 border border-primary/20 p-1.5 text-center">
+                        <div className="rounded-lg bg-primary/10 border border-primary/20 p-1.5 text-center">
                           <p className="font-bold text-text-main">{reg.SECTION_NAME || 'TBA'}</p>
                           <p className="text-text-muted">Sec</p>
                         </div>
-                        <div className="rounded-lg bg-cyan-50 border border-cyan-300/20 p-1.5 text-center">
-                          <p className="font-bold text-cyan-700">{reg.CREDITS}</p>
+                        <div className="rounded-lg bg-accent/10 border border-accent/20 p-1.5 text-center">
+                          <p className="font-bold text-accent">{reg.CREDITS}</p>
                           <p className="text-text-muted">Cred</p>
                         </div>
-                        <div className="rounded-lg bg-orange-50 border border-orange-300/20 p-1.5 text-center">
-                          <p className="font-bold text-orange-700">{reg.SEMESTER}</p>
+                        <div className="rounded-lg bg-warning/10 border border-warning/20 p-1.5 text-center">
+                          <p className="font-bold text-warning">{reg.SEMESTER}</p>
                           <p className="text-text-muted">Sem</p>
                         </div>
                       </div>
@@ -464,9 +464,9 @@ export default function StudentDashboard() {
                               {attendanceMap[reg.SECTION_ID] != null ? `${attendanceMap[reg.SECTION_ID]}%` : '—'}
                             </span>
                           </div>
-                          <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                          <div className="h-2 rounded-full bg-gray-700 overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-primary to-pink-500" 
+                              className="h-full bg-gradient-to-r from-primary to-emerald-400" 
                               style={{ width: `${attendanceMap[reg.SECTION_ID] || 0}%` }} 
                             />
                           </div>
@@ -481,7 +481,7 @@ export default function StudentDashboard() {
                           </button>
                         )}
                         {reg.STATUS === 'ACTIVE' && reg.SEMESTER === semester && (
-                          <button onClick={() => setDropTarget(reg.REGISTRATION_ID)} className="flex-1 text-[10px] font-bold text-red-700 bg-red-100 rounded py-1.5 hover:bg-red-200 transition-all">
+                          <button onClick={() => setDropTarget(reg.REGISTRATION_ID)} className="flex-1 text-[10px] font-bold text-danger bg-danger/15 rounded py-1.5 hover:bg-danger/25 transition-all">
                             🗑️ Drop
                           </button>
                         )}
@@ -571,7 +571,7 @@ export default function StudentDashboard() {
                 </div>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/10 text-left text-text-muted">
+                    <tr className="border-b border-gray-700/50 text-left text-text-muted">
                       <th className="pb-2">Date</th>
                       <th className="pb-2">Course</th>
                       <th className="pb-2 text-right">Status</th>
@@ -579,7 +579,7 @@ export default function StudentDashboard() {
                   </thead>
                   <tbody>
                     {attDetail.map((a, i) => (
-                      <tr key={i} className="border-b border-white/5">
+                      <tr key={i} className="border-b border-gray-700/30">
                         <td className="py-2 text-text-main">{new Date(a.ATTENDANCE_DATE).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                         <td className="py-2 text-text-muted">{a.COURSE_CODE} — {a.SECTION_NAME}</td>
                         <td className="py-2 text-right"><span className={`badge ${statusBadge(a.STATUS)}`}>{a.STATUS}</span></td>
@@ -618,7 +618,7 @@ function CourseSelectRow({ course, inCart, disabled, alreadyRegistered, onAdd, o
     <div className={`rounded-xl border transition-all ${
       alreadyRegistered ? 'border-success/20 bg-success/5 opacity-60' :
       inCart ? 'border-primary/30 bg-primary/5' :
-      'border-white/10 bg-white/[0.02] hover:border-white/20'
+      'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
     }`}>
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">

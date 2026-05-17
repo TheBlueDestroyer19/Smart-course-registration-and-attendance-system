@@ -2,25 +2,25 @@
 
 /* ── Custom Design Tokens ─────────────────────────────── */
 @theme {
-  --color-primary: #FF1493;
-  --color-primary-light: #FF69B4;
-  --color-primary-dark: #DB0074;
-  --color-accent: #00FFFF;
-  --color-surface: #F5F0FF;
-  --color-surface-light: #FFE8F5;
-  --color-surface-card: #FFFBFE;
-  --color-text-main: #2D0A3F;
-  --color-text-muted: #6B4B7A;
-  --color-success: #00DD88;
-  --color-danger: #FF4560;
-  --color-warning: #FFB84D;
+  --color-primary: #A3E635;
+  --color-primary-light: #BEF264;
+  --color-primary-dark: #65A30D;
+  --color-accent: #38BDF8;
+  --color-surface: #111827;
+  --color-surface-light: #1F2937;
+  --color-surface-card: #1F2937;
+  --color-text-main: #F3F4F6;
+  --color-text-muted: #9CA3AF;
+  --color-success: #34D399;
+  --color-danger: #F87171;
+  --color-warning: #FBBF24;
 }
 
 /* ── Base ──────────────────────────────────────────────── */
 body {
   @apply bg-surface text-text-main antialiased;
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  background: linear-gradient(135deg, #F5F0FF 0%, #FFE8F5 50%, #FFF0E8 100%);
+  background: linear-gradient(145deg, #0B0F19 0%, #111827 40%, #0F172A 100%);
   min-height: 100vh;
 }
 
@@ -32,22 +32,24 @@ main {
 
 /* ── Glassmorphism Card ────────────────────────────────── */
 .glass-card {
-  @apply rounded-3xl border-2 border-primary/40 bg-gradient-to-br from-white via-primary/5 to-accent/10 p-6 shadow-lg transition-all duration-300;
-  backdrop-filter: blur(10px);
+  @apply rounded-3xl border border-gray-700/50 p-6 shadow-lg transition-all duration-300;
+  background: linear-gradient(135deg, rgba(31,41,55,0.8) 0%, rgba(17,24,39,0.9) 100%);
+  backdrop-filter: blur(12px);
 }
 .glass-card:hover {
-  @apply border-primary/60 shadow-xl scale-[1.01] from-white to-primary/10;
-  box-shadow: 0 20px 50px rgba(255, 20, 147, 0.15);
+  @apply border-primary/30 shadow-xl scale-[1.01];
+  box-shadow: 0 20px 50px rgba(163, 230, 53, 0.06);
 }
 
 /* ── Gradient Button ───────────────────────────────────── */
 .btn-primary {
-  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary via-pink-500 to-orange-400 px-6 py-3 font-bold text-white shadow-lg transition-all duration-200;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl px-6 py-3 font-bold text-gray-900 shadow-lg transition-all duration-200;
+  background: linear-gradient(135deg, #A3E635 0%, #65A30D 100%);
+  text-shadow: none;
 }
 .btn-primary:hover {
   @apply scale-[1.05] shadow-xl;
-  box-shadow: 0 15px 40px rgba(255, 20, 147, 0.4);
+  box-shadow: 0 15px 40px rgba(163, 230, 53, 0.3);
 }
 .btn-primary:active {
   @apply scale-[0.96];
@@ -58,29 +60,29 @@ main {
 
 /* ── Ghost Button ──────────────────────────────────────── */
 .btn-ghost {
-  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-primary/40 bg-white/60 px-5 py-2.5 font-semibold text-primary transition-all duration-200;
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-gray-600 bg-gray-800/60 px-5 py-2.5 font-semibold text-text-main transition-all duration-200;
 }
 .btn-ghost:hover {
-  @apply border-primary/70 bg-white scale-[1.02];
-  box-shadow: 0 8px 20px rgba(255, 20, 147, 0.2);
+  @apply border-primary/50 bg-gray-700/60 scale-[1.02];
+  box-shadow: 0 8px 20px rgba(163, 230, 53, 0.1);
 }
 
 /* ── Input ─────────────────────────────────────────────── */
 .input-field {
-  @apply w-full rounded-2xl border-2 border-primary/30 bg-white/80 px-4 py-3 text-text-main placeholder-text-muted outline-none transition-all duration-200 focus:border-primary focus:ring-4 focus:ring-primary/20;
+  @apply w-full rounded-2xl border border-gray-600 bg-gray-900/80 px-4 py-3 text-text-main placeholder-text-muted outline-none transition-all duration-200 focus:border-primary focus:ring-4 focus:ring-primary/20;
   backdrop-filter: blur(5px);
 }
 
 /* Fix dropdown options visibility */
 .input-field option,
 select option {
-  background-color: #FFFBFE;
-  color: #2D0A3F;
+  background-color: #1F2937;
+  color: #F3F4F6;
 }
 
 /* Pending badge */
 .badge-pending {
-  @apply bg-warning/30 text-orange-700 font-semibold;
+  @apply bg-warning/20 text-warning font-semibold;
 }
 
 /* ── Status Badge ──────────────────────────────────────── */
@@ -88,16 +90,16 @@ select option {
   @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold;
 }
 .badge-present {
-  @apply bg-success/30 text-green-700;
+  @apply bg-success/20 text-success;
 }
 .badge-absent {
-  @apply bg-danger/30 text-red-700;
+  @apply bg-danger/20 text-danger;
 }
 .badge-late {
-  @apply bg-warning/30 text-orange-700;
+  @apply bg-warning/20 text-warning;
 }
 .badge-excused {
-  @apply bg-accent/30 text-cyan-700;
+  @apply bg-accent/20 text-accent;
 }
 
 /* ── Animations ────────────────────────────────────────── */
@@ -114,7 +116,7 @@ select option {
   100% { background-position: 200% 0; }
 }
 .skeleton {
-  @apply rounded-lg bg-gradient-to-r from-primary/20 via-accent/20 to-orange-300/20;
+  @apply rounded-lg bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800;
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -125,8 +127,8 @@ select option {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 20, 147, 0.3)); }
-  50% { filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.6)); }
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(163, 230, 53, 0.5)); }
 }
 
 .animate-float { animation: float-up 6s ease-in-out infinite; }

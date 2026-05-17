@@ -349,5 +349,13 @@ INITRANS 2 MAXTRANS 255
 STORAGE (INITIAL 64K NEXT 1M MINEXTENTS 1);
 
 -- ============================================================================
+-- TRIGGERS
+-- ============================================================================
+
+-- Prevent adding students whose admission year is later than the current active semester year.
+-- If no active semester is set, the trigger does not block the insert.
+CREATE OR REPLACE TRIGGER trg_check_student_admission_year BEFORE INSERT ON STUDENT FOR EACH ROW DECLARE active_session_year NUMBER; BEGIN SELECT s.session_year INTO active_session_year FROM ACTIVE_SEMESTER a JOIN ACADEMIC_SESSION s ON a.session_code = s.session_code WHERE a.id = 1; IF :NEW.admission_year > active_session_year THEN RAISE_APPLICATION_ERROR(-20001, 'Admission year cannot be greater than the current active semester year.'); END IF; EXCEPTION WHEN NO_DATA_FOUND THEN NULL; END;
+
+-- ============================================================================
 -- END OF SCHEMA
 -- ============================================================================

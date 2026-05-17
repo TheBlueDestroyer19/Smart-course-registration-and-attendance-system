@@ -514,6 +514,9 @@ router.post('/students', verifyToken, authorize('admin'), async (req, res) => {
   } catch (err) {
     console.error('Create student error:', err);
     if (err.errorNum === 1) return res.status(409).json({ error: 'Student email or enrollment number already exists.' });
+    if (err.errorNum === 20001 || String(err.message || '').includes('ORA-20001')) {
+      return res.status(400).json({ error: 'Admission Year greater than current session' });
+    }
     return res.status(500).json({ error: 'Internal server error.' });
   } finally {
     if (conn) await conn.close();

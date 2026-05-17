@@ -31,27 +31,27 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 relative overflow-hidden">
-      {/* Decorative gradient orbs - Tropical */}
+      {/* Decorative gradient orbs — dark lime/emerald */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-primary/30 to-pink-400/30 blur-[120px] animate-float" />
-        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-orange-400/30 to-yellow-300/30 blur-[120px] animate-float" />
-        <div className="absolute top-1/3 left-1/3 h-[400px] w-[400px] rounded-full bg-gradient-to-r from-accent/20 to-cyan-300/20 blur-[100px] animate-pulse-glow" />
+        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-primary/15 to-emerald-500/10 blur-[120px] animate-float" />
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-lime-600/10 to-green-400/10 blur-[120px] animate-float" />
+        <div className="absolute top-1/3 left-1/3 h-[400px] w-[400px] rounded-full bg-gradient-to-r from-accent/8 to-sky-400/8 blur-[100px] animate-pulse-glow" />
       </div>
 
       <div className="animate-fade-in-up relative w-full max-w-lg z-10">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary via-pink-500 to-orange-400 text-3xl font-bold text-white shadow-lg animate-pulse-glow">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-primary text-3xl font-bold text-gray-900 shadow-lg animate-pulse-glow">
             U
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">UniTrack</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">UniTrack</h1>
           <p className="mt-2 text-text-muted font-semibold">Student Registration & Attendance Portal</p>
         </div>
 
         {/* Card */}
         <div className="glass-card">
           {/* Role Toggle */}
-          <div className="mb-6 flex overflow-hidden rounded-2xl border-2 border-primary/40 bg-white p-1.5">
+          <div className="mb-6 flex overflow-hidden rounded-2xl border border-gray-600 bg-gray-900/80 p-1.5">
             {[{ key: 'student', label: 'Student' }, { key: 'instructor', label: 'Faculty' }, { key: 'admin', label: 'Admin' }].map((r) => (
               <button
                 key={r.key}
@@ -59,8 +59,8 @@ export default function Login() {
                 onClick={() => setRole(r.key)}
                 className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-200 ${
                   role === r.key
-                    ? 'bg-gradient-to-r from-primary via-pink-500 to-orange-400 text-white shadow-md scale-105'
-                    : 'text-text-main hover:bg-primary/10'
+                    ? 'bg-primary text-gray-900 shadow-md scale-105'
+                    : 'text-text-muted hover:text-text-main hover:bg-gray-700/50'
                 }`}
                 id={`role-toggle-${r.key}`}
               >
@@ -101,7 +101,7 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="rounded-2xl bg-danger/20 border-2 border-danger/40 px-4 py-3 text-sm font-semibold text-red-700" role="alert">
+              <div className="rounded-2xl bg-danger/15 border border-danger/30 px-4 py-3 text-sm font-semibold text-danger" role="alert">
                 {error}
               </div>
             )}
@@ -114,7 +114,7 @@ export default function Login() {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-900 border-t-transparent" />
                   Signing in…
                 </span>
               ) : (
